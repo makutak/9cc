@@ -253,5 +253,8 @@ int main(int argc, char **argv) {
   // それをRAXにロードしてから関数からの返り値とする
   printf("  pop rax\n");
   printf("  ret\n");
+
+  printf(".section .note.GNU-stack,\"\",@progbits\n"); // 警告を消すため
+
   return 0;
 }
