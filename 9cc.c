@@ -200,33 +200,33 @@ Node *primary() {
 
 void gen(Node *node) {
   if (node->kind == ND_NUM) {
-    printf(" push %d\n", node->val);
+    printf("  push %d\n", node->val);
     return;
   }
 
   gen(node->lhs);
   gen(node->rhs);
 
-  printf(" pop rdi\n");
-  printf(" pop rax\n");
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
 
   switch (node->kind) {
   case ND_ADD:
-    printf(" add rax, rdi\n");
+    printf("  add rax, rdi\n");
     break;
   case ND_SUB:
-    printf(" sub rax, rdi\n");
+    printf("  sub rax, rdi\n");
     break;
   case ND_MUL:
-    printf(" imul rax, rdi\n");
+    printf("  imul rax, rdi\n");
     break;
   case ND_DIV:
-    printf(" cqo\n");
-    printf(" idiv rdi\n");
+    printf("  cqo\n");
+    printf("  idiv rdi\n");
     break;
   }
 
-  printf(" push rax\n");
+  printf("  push rax\n");
 }
 
 
@@ -251,7 +251,7 @@ int main(int argc, char **argv) {
 
   // スタックトップに式全体の値が残っているはずなので
   // それをRAXにロードしてから関数からの返り値とする
-  printf(" pop rax\n");
-  printf(" ret\n");
+  printf("  pop rax\n");
+  printf("  ret\n");
   return 0;
 }
