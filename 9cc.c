@@ -5,22 +5,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // トークンの種類
 typedef enum {
-  TK_RESERVED,  // 記号
-  TK_NUM,       // 整数トークン
-  TK_EOF,       // 入力の終わりを表すトークン
+  TK_RESERVED, // 記号
+  TK_NUM,      // 整数トークン
+  TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 
 typedef struct Token Token;
 
 // トークン型
 struct Token {
-  TokenKind kind;  // トークンの型
-  Token *next;     // 次の入力トークン
-  int val;         // kindがTK_NUMの場合、その数値
-  char *str;       // トークン文字列
+  TokenKind kind; // トークンの型
+  Token *next;    // 次の入力トークン
+  int val;        // kindがTK_NUMの場合、その数値
+  char *str;      // トークン文字列
 };
 
 // 入力プログラム
@@ -56,7 +55,8 @@ void error_at(char *loc, char *fmt, ...) {
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
 bool consume(char op) {
-  if (token->kind != TK_RESERVED || token->str[0] != op) return false;
+  if (token->kind != TK_RESERVED || token->str[0] != op)
+    return false;
 
   token = token->next;
   return true;
@@ -71,14 +71,17 @@ void expect(char op) {
 }
 
 int expect_number() {
-  if (token->kind != TK_NUM) error_at(token->str, "数ではありません");
+  if (token->kind != TK_NUM)
+    error_at(token->str, "数ではありません");
 
   int val = token->val;
   token = token->next;
   return val;
 }
 
-bool at_eof() { return token->kind == TK_EOF; }
+bool at_eof() {
+  return token->kind == TK_EOF;
+}
 
 // 新しいトークンを作成してcurに繋げる
 Token *new_token(TokenKind kind, Token *cur, char *str) {
@@ -120,7 +123,6 @@ Token *tokenize() {
   return head.next;
 }
 
-
 // 抽象構文木のノードの種類
 typedef enum {
   ND_ADD, // +
@@ -161,7 +163,9 @@ Node *primary();
 
 // expr = mul ("+" mul | "-" mul)*
 Node *expr() {
+  printf("expr token: %c\n", *token->str);
   Node *node = mul();
+
   for (;;) {
     if (consume('+'))
       node = new_node(ND_ADD, node, mul());
@@ -174,7 +178,9 @@ Node *expr() {
 
 // mul  = primary ("*" primary | "/" primary)*
 Node *mul() {
+  printf("mul token: %c\n", *token->str);
   Node *node = primary();
+
   for (;;) {
     if (consume('*'))
       node = new_node(ND_MUL, node, primary());
@@ -187,6 +193,7 @@ Node *mul() {
 
 // primary = num | "(" expr ")"
 Node *primary() {
+  printf("primary token: %c\n", *token->str);
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume('(')) {
     Node *node = expr();
@@ -228,7 +235,6 @@ void gen(Node *node) {
 
   printf("  push rax\n");
 }
-
 
 int main(int argc, char **argv) {
   if (argc != 2) {
