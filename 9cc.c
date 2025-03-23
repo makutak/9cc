@@ -58,6 +58,7 @@ bool consume(char op) {
   if (token->kind != TK_RESERVED || token->str[0] != op)
     return false;
 
+  printf("enter consume: token = %c\n", *token->str);
   token = token->next;
   return true;
 }
@@ -75,6 +76,7 @@ int expect_number() {
     error_at(token->str, "数ではありません");
 
   int val = token->val;
+  printf("enter expect_number: token = %c\n", *token->str);
   token = token->next;
   return val;
 }
@@ -236,6 +238,31 @@ void gen(Node *node) {
   printf("  push rax\n");
 }
 
+void print_ast(Node *node, int depth) {
+  for (int i = 0; i < depth; i++)
+    printf("  ");
+  switch (node->kind) {
+  case ND_NUM:
+    printf("NUM: %d\n", node->val);
+    return;
+  case ND_ADD:
+    printf("ADD\n");
+    break;
+  case ND_SUB:
+    printf("SUB\n");
+    break;
+  case ND_MUL:
+    printf("MUL\n");
+    break;
+  case ND_DIV:
+    printf("DIV\n");
+    break;
+  }
+
+  print_ast(node->lhs, depth + 1);
+  print_ast(node->rhs, depth + 1);
+}
+
 int main(int argc, char **argv) {
   if (argc != 2) {
     fprintf(stderr, "引数の個数が正しくありません\n");
@@ -246,6 +273,7 @@ int main(int argc, char **argv) {
   user_input = argv[1];
   token = tokenize();
   Node *node = expr();
+  print_ast(node, 0);
 
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");
