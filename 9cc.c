@@ -58,7 +58,6 @@ bool consume(char op) {
   if (token->kind != TK_RESERVED || token->str[0] != op)
     return false;
 
-  printf("enter consume: token = %c\n", *token->str);
   token = token->next;
   return true;
 }
@@ -76,7 +75,6 @@ int expect_number() {
     error_at(token->str, "数ではありません");
 
   int val = token->val;
-  printf("enter expect_number: token = %c\n", *token->str);
   token = token->next;
   return val;
 }
@@ -161,11 +159,12 @@ Node *new_node_num(int val) {
 
 Node *expr();
 Node *mul();
+Node *unary();
+;
 Node *primary();
 
 // expr = mul ("+" mul | "-" mul)*
 Node *expr() {
-  printf("expr token: %c\n", *token->str);
   Node *node = mul();
 
   for (;;) {
@@ -178,24 +177,33 @@ Node *expr() {
   }
 }
 
-// mul  = primary ("*" primary | "/" primary)*
+// mul  = unary ("*" unary | "/" unary)*
 Node *mul() {
-  printf("mul token: %c\n", *token->str);
-  Node *node = primary();
+  Node *node = unary();
 
   for (;;) {
     if (consume('*'))
-      node = new_node(ND_MUL, node, primary());
+      node = new_node(ND_MUL, node, unary());
     else if (consume('/'))
-      node = new_node(ND_DIV, node, primary());
+      node = new_node(ND_DIV, node, unary());
     else
       return node;
   }
 }
 
+// unary = ("+" | "-")? primary
+Node *unary() {
+  for (;;) {
+    if (consume('+'))
+      return unary();
+    if (consume('-'))
+      return new_node(ND_SUB, new_node_num(0), unary());
+    return primary();
+  }
+}
+
 // primary = num | "(" expr ")"
 Node *primary() {
-  printf("primary token: %c\n", *token->str);
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume('(')) {
     Node *node = expr();
@@ -273,7 +281,7 @@ int main(int argc, char **argv) {
   user_input = argv[1];
   token = tokenize();
   Node *node = expr();
-  print_ast(node, 0);
+  // print_ast(node, 0);
 
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");
