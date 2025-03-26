@@ -85,10 +85,11 @@ bool at_eof() {
 }
 
 // 新しいトークンを作成してcurに繋げる
-Token *new_token(TokenKind kind, Token *cur, char *str) {
+Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;
   tok->str = str;
+  tok->len = len;
   cur->next = tok;
   return tok;
 }
@@ -107,20 +108,22 @@ Token *tokenize() {
     }
 
     if (strchr("+-*/()", *p)) {
-      cur = new_token(TK_RESERVED, cur, p++);
+      cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
 
     if (isdigit(*p)) {
-      cur = new_token(TK_NUM, cur, p);
+      cur = new_token(TK_NUM, cur, p, 0);
+      char *q = p;
       cur->val = strtol(p, &p, 10);
+      cur->len = p - q;
       continue;
     }
 
     error_at(p, "数ではありません");
   }
 
-  new_token(TK_EOF, cur, p);
+  new_token(TK_EOF, cur, p, 0);
   return head.next;
 }
 
