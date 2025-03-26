@@ -20,6 +20,7 @@ struct Token {
   Token *next;    // 次の入力トークン
   int val;        // kindがTK_NUMの場合、その数値
   char *str;      // トークン文字列
+  int len;        // トークンの長さ
 };
 
 // 入力プログラム
@@ -54,8 +55,8 @@ void error_at(char *loc, char *fmt, ...) {
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
-bool consume(char op) {
-  if (token->kind != TK_RESERVED || token->str[0] != op)
+bool consume(char *op) {
+  if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
     return false;
 
   token = token->next;
@@ -168,9 +169,9 @@ Node *expr() {
   Node *node = mul();
 
   for (;;) {
-    if (consume('+'))
+    if (consume("+"))
       node = new_node(ND_ADD, node, mul());
-    else if (consume('-'))
+    else if (consume("-"))
       node = new_node(ND_SUB, node, mul());
     else
       return node;
@@ -182,9 +183,9 @@ Node *mul() {
   Node *node = unary();
 
   for (;;) {
-    if (consume('*'))
+    if (consume("*"))
       node = new_node(ND_MUL, node, unary());
-    else if (consume('/'))
+    else if (consume("/"))
       node = new_node(ND_DIV, node, unary());
     else
       return node;
@@ -194,9 +195,9 @@ Node *mul() {
 // unary = ("+" | "-")? primary
 Node *unary() {
   for (;;) {
-    if (consume('+'))
+    if (consume("+"))
       return unary();
-    if (consume('-'))
+    if (consume("-"))
       return new_node(ND_SUB, new_node_num(0), unary());
     return primary();
   }
@@ -205,7 +206,7 @@ Node *unary() {
 // primary = num | "(" expr ")"
 Node *primary() {
   // 次のトークンが"("なら、"(" expr ")" のはず
-  if (consume('(')) {
+  if (consume("(")) {
     Node *node = expr();
     expect(')');
     return node;
