@@ -164,7 +164,6 @@ Node *new_node_num(int val) {
 Node *expr();
 Node *mul();
 Node *unary();
-;
 Node *primary();
 
 // expr = mul ("+" mul | "-" mul)*
