@@ -94,6 +94,10 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   return tok;
 }
 
+bool startswith(char *p, char *q) {
+  return memcmp(p, q, strlen(q)) == 0;
+}
+
 // 入力文字列pをトークナイズしてそれを返す
 Token *tokenize() {
   char *p = user_input;
@@ -107,7 +111,13 @@ Token *tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()", *p)) {
+    if (startswith(p, "==") || startswith(p, "!=") || startswith(p, "<=") || startswith(p, ">=")) {
+      cur = new_token(TK_RESERVED, cur, p, 2);
+      p += 2;
+      continue;
+    }
+
+    if (strchr("+-*/()<>", *p)) {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -166,12 +176,52 @@ Node *new_node_num(int val) {
 }
 
 Node *expr();
+Node *equality();
+Node *relational();
+Node *add();
 Node *mul();
 Node *unary();
 Node *primary();
 
-// expr = mul ("+" mul | "-" mul)*
+// expr = equality
 Node *expr() {
+  return equality();
+}
+
+// equality = relational ( "==" relational | "!=" relational)*
+Node *equality() {
+  Node *node = relational();
+
+  for (;;) {
+    if (consume("=="))
+      node = new_node(ND_EQ, node, relational());
+    else if (consume("!="))
+      node = new_node(ND_NE, node, relational());
+    else
+      return node;
+  }
+}
+
+// relational = add ("<" add | "<=" add | ">" add  | ">=" add)*
+Node *relational() {
+  Node *node = add();
+
+  for (;;) {
+    if (consume("<"))
+      node = new_node(ND_LT, node, add());
+    else if (consume("<="))
+      node = new_node(ND_LE, node, add());
+    else if (consume(">"))
+      node = new_node(ND_LT, add(), node);
+    else if (consume(">="))
+      node = new_node(ND_LE, add(), node);
+    else
+      return node;
+  }
+}
+
+// add = mul ("+" mul | "-" mul)*
+Node *add() {
   Node *node = mul();
 
   for (;;) {
@@ -248,6 +298,26 @@ void gen(Node *node) {
     printf("  cqo\n");
     printf("  idiv rdi\n");
     break;
+  case ND_EQ:
+    printf("  cmp rax, rdi\n");
+    printf("  sete al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_NE:
+    printf("  cmp rax, rdi\n");
+    printf("  setne al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_LT:
+    printf("  cmp rax, rdi\n");
+    printf("  setl al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_LE:
+    printf("  cmp rax, rdi\n");
+    printf("  setle al\n");
+    printf("  movzb rax, al\n");
+    break;
   }
 
   printf("  push rax\n");
@@ -271,6 +341,18 @@ void print_ast(Node *node, int depth) {
     break;
   case ND_DIV:
     printf("DIV\n");
+    break;
+  case ND_EQ:
+    printf("EQ\n");
+    break;
+  case ND_NE:
+    printf("NE\n");
+    break;
+  case ND_LT:
+    printf("LT\n");
+    break;
+  case ND_LE:
+    printf("LE\n");
     break;
   }
 
