@@ -1,0 +1,106 @@
+#include "9cc.h"
+
+void gen(Node *node) {
+  if (node->kind == ND_NUM) {
+    printf("  push %d\n", node->val);
+    return;
+  }
+
+  gen(node->lhs);
+  gen(node->rhs);
+
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
+
+  switch (node->kind) {
+  case ND_ADD:
+    printf("  add rax, rdi\n");
+    break;
+  case ND_SUB:
+    printf("  sub rax, rdi\n");
+    break;
+  case ND_MUL:
+    printf("  imul rax, rdi\n");
+    break;
+  case ND_DIV:
+    printf("  cqo\n");
+    printf("  idiv rdi\n");
+    break;
+  case ND_EQ:
+    printf("  cmp rax, rdi\n");
+    printf("  sete al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_NE:
+    printf("  cmp rax, rdi\n");
+    printf("  setne al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_LT:
+    printf("  cmp rax, rdi\n");
+    printf("  setl al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_LE:
+    printf("  cmp rax, rdi\n");
+    printf("  setle al\n");
+    printf("  movzb rax, al\n");
+    break;
+  }
+
+  printf("  push rax\n");
+}
+
+void codegen(Node *node) {
+  // アセンブリの前半部分を出力
+  printf(".intel_syntax noprefix\n");
+  printf(".global main\n");
+  printf("main:\n");
+
+  // 抽象構文木を下りながらコード生成
+  gen(node);
+
+  // スタックトップに式全体の値が残っているはずなので
+  // それをRAXにロードしてから関数からの返り値とする
+  printf("  pop rax\n");
+  printf("  ret\n");
+
+  printf(".section .note.GNU-stack,\"\",@progbits\n"); // 警告を消すため
+}
+
+void print_ast(Node *node, int depth) {
+  for (int i = 0; i < depth; i++)
+    printf("  ");
+  switch (node->kind) {
+  case ND_NUM:
+    printf("NUM: %d\n", node->val);
+    return;
+  case ND_ADD:
+    printf("ADD\n");
+    break;
+  case ND_SUB:
+    printf("SUB\n");
+    break;
+  case ND_MUL:
+    printf("MUL\n");
+    break;
+  case ND_DIV:
+    printf("DIV\n");
+    break;
+  case ND_EQ:
+    printf("EQ\n");
+    break;
+  case ND_NE:
+    printf("NE\n");
+    break;
+  case ND_LT:
+    printf("LT\n");
+    break;
+  case ND_LE:
+    printf("LE\n");
+    break;
+  }
+
+  print_ast(node->lhs, depth + 1);
+  print_ast(node->rhs, depth + 1);
+}
