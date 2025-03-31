@@ -13,4 +13,12 @@ test: 9cc
 clean:
 	rm -f 9cc *.o *~ tmp*
 
-.PHONY: test clean
+tags:
+	universal-ctags -e -R .
+
+cscope:
+	cscope -Rbq
+
+update: tags cscope
+
+.PHONY: test clean tags cscope update
