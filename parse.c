@@ -15,13 +15,21 @@ Node *new_node_num(int val) {
   return node;
 }
 
+Node *program();
+Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
 Node *primary();
+
+// program = stmt*
+// stmt = exprt ";"
+// exprt = assign
+// assign = equality ("=" assign)?
 
 // expr = equality
 Node *expr() {
