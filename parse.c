@@ -15,7 +15,7 @@ Node *new_node_num(int val) {
   return node;
 }
 
-Node *program();
+void program();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -26,14 +26,34 @@ Node *mul();
 Node *unary();
 Node *primary();
 
-// program = stmt*
-// stmt = exprt ";"
-// exprt = assign
-// assign = equality ("=" assign)?
+Node *code[100];
 
-// expr = equality
+// program = stmt*
+void program() {
+  int i = 0;
+  while (!at_eof())
+    code[i++] = stmt();
+  code[i] = NULL;
+}
+
+// stmt = exprt ";"
+Node *stmt() {
+  Node *node = expr();
+  expect(";");
+  return node;
+}
+
+// exprt = assign
 Node *expr() {
-  return equality();
+  return assign();
+}
+
+// assign = equality ("=" assign)?
+Node *assign() {
+  Node *node = equality();
+  if (consume("="))
+    node = new_node(ND_ASSIGN, node, assign());
+  return node;
 }
 
 // equality = relational ( "==" relational | "!=" relational)*
