@@ -74,11 +74,13 @@ struct Node {
   int offset;    // kindがND_LVARの場合のみ使う
 };
 
-Node *expr();
+extern Node *code[100];
+
+void program();
 
 //
 // codegen.c
 //
-
+void gen(Node *node);
 void codegen(Node *node);
 void print_ast(Node *node, int depth);
