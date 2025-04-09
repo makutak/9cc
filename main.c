@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
   printf("  sub rsp, 208\n");
   // 先頭の式から順にコード生成
   for (int i = 0; code[i]; i++) {
+    // print_ast(code[i], 0);
     gen(code[i]);
 
     // 式の評価結果としてスタックに一つの値が残っているはずなので、

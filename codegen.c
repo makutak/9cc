@@ -100,6 +100,12 @@ void print_ast(Node *node, int depth) {
   case ND_NUM:
     printf("NUM: %d\n", node->val);
     return;
+  case ND_LVAR:
+    printf("LVAR: offset=%d\n", node->offset);
+    return;
+  case ND_ASSIGN:
+    printf("ASSIGN\n");
+    break;
   case ND_ADD:
     printf("ADD\n");
     break;
@@ -126,6 +132,9 @@ void print_ast(Node *node, int depth) {
     break;
   }
 
-  print_ast(node->lhs, depth + 1);
-  print_ast(node->rhs, depth + 1);
+  // ND_NUM や ND_LVAR のように左右の子を持たないノードでは再帰しない
+  if (node->lhs)
+    print_ast(node->lhs, depth + 1);
+  if (node->rhs)
+    print_ast(node->rhs, depth + 1);
 }
