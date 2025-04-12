@@ -48,8 +48,8 @@ Token *consume_ident() {
   return tok;
 }
 
-bool consume_return() {
-  if (token->kind != TK_RETURN)
+bool consume_kind(TokenKind kind) {
+  if (token->kind != kind)
     return false;
 
   token = token->next;
