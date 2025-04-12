@@ -48,10 +48,21 @@ void program() {
   code[i] = NULL;
 }
 
-// stmt = exprt ";"
+// stmt = exprt ";" | "return" expr ";"
 Node *stmt() {
-  Node *node = expr();
-  expect(";");
+  Node *node;
+
+  if (consume_return()) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_RETURN;
+    node->lhs = expr();
+  } else {
+    node = expr();
+  }
+
+  if (!consume(";"))
+    error_at(token->str, "';'ではないトークンです");
+
   return node;
 }
 

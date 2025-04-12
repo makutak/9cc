@@ -48,6 +48,14 @@ Token *consume_ident() {
   return tok;
 }
 
+bool consume_return() {
+  if (token->kind != TK_RETURN)
+    return false;
+
+  token = token->next;
+  return true;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する
 void expect(char *op) {
@@ -101,6 +109,12 @@ Token *tokenize() {
   while (*p) {
     if (isspace(*p)) {
       p++;
+      continue;
+    }
+
+    if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
+      cur = new_token(TK_RETURN, cur, p, 6);
+      p += 6;
       continue;
     }
 
