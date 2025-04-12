@@ -36,8 +36,12 @@ Node *primary();
 
 Node *code[100];
 
+int offset = 0;
+
 // program = stmt*
 void program() {
+  locals = NULL;
+
   int i = 0;
   while (!at_eof())
     code[i++] = stmt();
@@ -157,7 +161,8 @@ Node *primary() {
       lvar->next = locals;
       lvar->name = tok->str;
       lvar->len = tok->len;
-      lvar->offset = locals ? locals->offset + 8 : 8;
+      offset += 8;
+      lvar->offset = offset;
       node->offset = lvar->offset;
       locals = lvar;
     }
