@@ -49,7 +49,9 @@ void program() {
   code[i] = NULL;
 }
 
-// stmt = exprt ";" | "return" expr ";"
+// stmt = exprt ";"
+//      | "return" expr ";"
+//      | "if" "(" expr ")" stmt ("else" stmt)?
 Node *stmt() {
   Node *node;
 
