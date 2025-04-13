@@ -2,7 +2,6 @@
 
 char *user_input;
 Token *token;
-LVar *locals;
 
 // エラーを報告するための関数
 // printfと同じ引数を取る

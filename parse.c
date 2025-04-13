@@ -35,6 +35,7 @@ Node *unary();
 Node *primary();
 
 Node *code[100];
+LVar *locals;
 
 int offset = 0;
 
