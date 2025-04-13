@@ -17,6 +17,7 @@ typedef enum {
   TK_EOF,      // 入力の終わりを表すトークン
   TK_RETURN,   // return を表すトークン
   TK_IF,       // if を表すトークン
+  TK_ELSE,     // else を表すトークン
 } TokenKind;
 
 typedef struct Token Token;

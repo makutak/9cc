@@ -54,4 +54,7 @@ assert 3 'foo=1; bar=foo+2;'
 assert 3 'foo = 1; bar = 2; return foo + bar;'
 assert 14 'a = 3;b = 5 * 6 - 8;return a + b / 2;'
 
+assert 1 'if (1) return 1; else return 0;'
+assert 0 'if (1 == 0) return 1; else return 0;'
+
 echo OK
