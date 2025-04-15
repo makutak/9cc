@@ -19,6 +19,7 @@ typedef enum {
   TK_IF,       // if を表すトークン
   TK_ELSE,     // else を表すトークン
   TK_WHILE,    // while を表すトークン
+  TK_FOR,      // for を表すトークン
 } TokenKind;
 
 typedef struct Token Token;
@@ -82,6 +83,7 @@ typedef enum {
   ND_RETURN, // return
   ND_IF,     // if
   ND_WHILE,  // while
+  ND_FOR,    // for
 } NodeKind;
 
 typedef struct Node Node;
@@ -94,10 +96,12 @@ struct Node {
   int val;       // kindがNU_NUMの場合のみ使う
   int offset;    // kindがND_LVARの場合のみ使う
 
-  // "if" statement
+  // "if", while, for  statement
   Node *cond;
   Node *then;
   Node *els;
+  Node *init;
+  Node *inc;
 };
 
 extern Node *code[100];

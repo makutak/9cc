@@ -135,6 +135,12 @@ Token *tokenize() {
       continue;
     }
 
+    if (strncmp(p, "for", 3) == 0 && !is_alnum(p[3])) {
+      cur = new_token(TK_FOR, cur, p, 3);
+      p += 3;
+      continue;
+    }
+
     if (startswith(p, "==") || startswith(p, "!=") || startswith(p, "<=") || startswith(p, ">=")) {
       cur = new_token(TK_RESERVED, cur, p, 2);
       p += 2;
