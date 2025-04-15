@@ -64,14 +64,17 @@ void gen(Node *node) {
     printf(".Lend%d:\n", seq);
     return;
   case ND_FOR:
-    gen(node->init);
+    if (node->init)
+      gen(node->init);
     printf(".Lbegin%d:\n", seq);
-    gen(node->cond);
+    if (node->cond)
+      gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
     printf("  je .Lend%d\n", seq);
     gen(node->then);
-    gen(node->inc);
+    if (node->inc)
+      gen(node->inc);
     printf("  jmp .Lbegin%d\n", seq);
     printf(".Lend%d:\n", seq);
     return;

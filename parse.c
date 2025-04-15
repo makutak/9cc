@@ -91,22 +91,24 @@ Node *stmt() {
   }
 
   if (consume_kind(TK_FOR)) {
-    expect("(");
-    Node *init = expr();
-    expect(";");
-    Node *cond = expr();
-    expect(";");
-    Node *inc = expr();
-
-    expect(")");
-
-    Node *then = stmt();
     node = calloc(1, sizeof(Node));
     node->kind = ND_FOR;
-    node->init = init;
-    node->cond = cond;
-    node->inc = inc;
-    node->then = then;
+
+    expect("(");
+    if (!consume(";")) {
+      node->init = expr();
+      expect(";");
+    }
+    if (!consume(";")) {
+      node->cond = expr();
+      expect(";");
+    }
+    if (!consume(")")) {
+      node->inc = expr();
+      expect(")");
+    }
+
+    node->then = stmt();
 
     return node;
   }
