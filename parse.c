@@ -52,6 +52,7 @@ void program() {
 // stmt = exprt ";"
 //      | "return" expr ";"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
+//      | "while" "(" expr ")" stmt
 Node *stmt() {
   Node *node;
 
@@ -70,6 +71,20 @@ Node *stmt() {
     if (consume_kind(TK_ELSE)) {
       node->els = stmt();
     }
+
+    return node;
+  }
+
+  if (consume_kind(TK_WHILE)) {
+    expect("(");
+    Node *cond = expr();
+    expect(")");
+
+    Node *then = stmt();
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_WHILE;
+    node->cond = cond;
+    node->then = then;
 
     return node;
   }
