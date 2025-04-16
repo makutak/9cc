@@ -50,10 +50,11 @@ void program() {
 }
 
 // stmt = exprt ";"
-//      | "return" expr ";"
+//      | "{" stmt* "}"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
 //      | "while" "(" expr ")" stmt
 //      | "for" "(" expr? ";" "expr? "; expr? ")" stmt
+//      | "return" expr ";"
 Node *stmt() {
   Node *node;
 
