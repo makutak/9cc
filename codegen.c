@@ -185,6 +185,12 @@ void print_ast(Node *node, int depth) {
   case ND_IF:
     printf("IF\n");
     break;
+  case ND_WHILE:
+    printf("WHILE\n");
+    break;
+  case ND_FOR:
+    printf("FOR\n");
+    break;
   }
 
   // ND_NUM や ND_LVAR のように左右の子を持たないノードでは再帰しない
@@ -198,4 +204,8 @@ void print_ast(Node *node, int depth) {
     print_ast(node->then, depth + 1);
   if (node->els)
     print_ast(node->els, depth + 1);
+  if (node->init)
+    print_ast(node->init, depth + 1);
+  if (node->inc)
+    print_ast(node->inc, depth + 1);
 }
