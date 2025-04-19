@@ -41,7 +41,6 @@ void gen(Node *node) {
     printf("  push rdi\n");
     return;
   case ND_IF:
-
     gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
