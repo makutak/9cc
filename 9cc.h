@@ -20,6 +20,7 @@ typedef enum {
   TK_ELSE,     // else を表すトークン
   TK_WHILE,    // while を表すトークン
   TK_FOR,      // for を表すトークン
+  TK_BLOCK,    // {} を表すトークン
 } TokenKind;
 
 typedef struct Token Token;
@@ -84,6 +85,7 @@ typedef enum {
   ND_IF,     // if
   ND_WHILE,  // while
   ND_FOR,    // for
+  ND_BLOCK,  // block {}
 } NodeKind;
 
 typedef struct Node Node;
@@ -102,6 +104,8 @@ struct Node {
   Node *els;
   Node *init;
   Node *inc;
+  // block {}
+  Node *block[100];
 };
 
 extern Node *code[100];

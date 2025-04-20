@@ -58,6 +58,24 @@ void program() {
 Node *stmt() {
   Node *node;
 
+  if (consume("{")) {
+    int i = 0;
+    Node *block[100];
+
+    while (!consume("}")) {
+      block[i++] = stmt();
+    }
+
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK;
+
+    for (int j = 0; j < i; j++) {
+      node->block[j] = block[j];
+    }
+
+    return node;
+  }
+
   if (consume_kind(TK_IF)) {
     expect("(");
     Node *cond = expr();

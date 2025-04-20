@@ -62,4 +62,9 @@ assert 11 'i=0; while(i<=10) i=i+1; return i;'
 assert 55 'i=0; j=0; for (i=0; i<=10; i=i+1) j=i+j; return j;'
 assert 3 'for (;;) return 3; return 5;'
 
+assert 7 'if (1) { foo = 7; return foo;} else {bar = 0; return bar;}'
+assert 0 'if (0) { foo = 7; return foo;} else {bar = 0; return bar;}'
+assert 7 'while(1) {foo = 7; return foo;} return 0;'
+assert 7 'for(;;) {foo = 7; return foo;} return 0;'
+
 echo OK
