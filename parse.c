@@ -230,7 +230,7 @@ Node *unary() {
   }
 }
 
-// primary = num | "(" expr ")"
+// primary = num | ident | "(" expr ")"
 Node *primary() {
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume("(")) {
