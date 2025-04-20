@@ -78,9 +78,13 @@ void gen(Node *node) {
     printf(".Lend%d:\n", seq);
     return;
   case ND_BLOCK:
-    for (int i = 0; node->block[i]; i++)
+    // node->block[i] != NULLでなければループしてgen
+    for (int i = 0; node->block[i]; i++) {
       gen(node->block[i]);
-    printf("  pop rax\n");
+      if (node->block[i]->kind != ND_RETURN) {
+        printf("  pop rax\n");
+      }
+    }
     return;
   }
 
