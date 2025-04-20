@@ -65,6 +65,7 @@ Node *stmt() {
     while (!consume("}")) {
       block[i++] = stmt();
     }
+    block[i] = NULL;
 
     node = calloc(1, sizeof(Node));
     node->kind = ND_BLOCK;
