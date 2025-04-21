@@ -70,7 +70,7 @@ Node *stmt() {
     node = calloc(1, sizeof(Node));
     node->kind = ND_BLOCK;
 
-    for (int j = 0; j < i; j++) {
+    for (int j = 0; j <= i; j++) {
       node->block[j] = block[j];
     }
 
