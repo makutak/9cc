@@ -54,6 +54,7 @@ int expect_number();
 bool at_eof();
 Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 Token *tokenize();
+char *strndup(char *p, int len);
 
 // 入力プログラム
 extern char *user_input;
@@ -86,6 +87,7 @@ typedef enum {
   ND_WHILE,  // while
   ND_FOR,    // for
   ND_BLOCK,  // block {}
+  ND_FUNCALL // Function call
 } NodeKind;
 
 typedef struct Node Node;
@@ -106,6 +108,9 @@ struct Node {
   Node *inc;
   // block {}
   Node *block[100];
+
+  // function name
+  char *funcname;
 };
 
 extern Node *code[100];
