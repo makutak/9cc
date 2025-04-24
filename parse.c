@@ -231,7 +231,10 @@ Node *unary() {
   }
 }
 
-// primary = num | ident | "(" expr ")"
+// primary = num
+//         | ident("(" ")")?
+//         | "(" expr ")"
+
 Node *primary() {
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume("(")) {
