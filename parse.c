@@ -231,10 +231,23 @@ Node *unary() {
   }
 }
 
-// primary = num
-//         | ident("(" ")")?
-//         | "(" expr ")"
+// func_args = "(" (expr ("," expr)*)? ")"
+Node *func_args() {
+  Node *args;
+  if (consume(")"))
+    return NULL;
 
+  while (consume(",")) {
+    args = expr();
+  }
+
+  expect(")");
+  return args;
+}
+
+// primary = num
+//         | ident func_args?
+//         | "(" expr ")"
 Node *primary() {
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume("(")) {
@@ -250,7 +263,8 @@ Node *primary() {
     if (consume("(")) {
       node->kind = ND_FUNCALL;
       node->funcname = strndup(tok->str, tok->len);
-      expect(")");
+      node->args[0] = func_args();
+
       return node;
     }
 

@@ -111,6 +111,7 @@ struct Node {
 
   // function name
   char *funcname;
+  Node *args[6];
 };
 
 extern Node *code[100];
