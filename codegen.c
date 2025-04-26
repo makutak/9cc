@@ -11,6 +11,8 @@ void gen_lval(Node *node) {
   printf("  push rax\n");
 }
 
+char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
 void gen(Node *node) {
   if (node->kind == ND_RETURN) {
     gen(node->lhs);
@@ -87,9 +89,12 @@ void gen(Node *node) {
     }
     return;
   case ND_FUNCALL:
-    if (node->args[0]) {
-      gen(node->args[0]);
-      printf("  pop rdi\n");
+    for (int i; i <= 6; i++) {
+      if (!node->args[i])
+        break;
+
+      gen(node->args[i]);
+      printf("  pop %s\n", argreg[i]);
     }
 
     printf("  call %s\n", node->funcname);

@@ -232,17 +232,17 @@ Node *unary() {
 }
 
 // func_args = "(" (expr ("," expr)*)? ")"
-Node *func_args() {
-  Node *args;
-  if (consume(")"))
-    return NULL;
+/* Node *func_args() { */
+/*   Node *args; */
+/*   if (consume(")")) */
+/*     return NULL; */
 
-  args = expr();
+/*   args = expr(); */
 
-  expect(")");
-  // printf("args->val: %d\n", args->val);
-  return args;
-}
+/*   expect(")"); */
+/*   // printf("args->val: %d\n", args->val); */
+/*   return args; */
+/* } */
 
 // primary = num
 //         | ident func_args?
@@ -262,7 +262,17 @@ Node *primary() {
     if (consume("(")) {
       node->kind = ND_FUNCALL;
       node->funcname = strndup(tok->str, tok->len);
-      node->args[0] = func_args();
+      for (int i = 0; i <= 6; i++) {
+        if (consume(")")) {
+          node->args[i] = NULL;
+          break;
+        }
+
+        Node *arg = expr();
+        node->args[i] = arg;
+        consume(",");
+      }
+
       return node;
     }
 
