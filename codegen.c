@@ -92,15 +92,11 @@ void gen(Node *node) {
     if (need_align)
       printf("  sub rsp, 8\n");
 
-    int nargs = 0;
-    for (Node *arg = node->args; arg; arg = arg->next_arg) {
+    for (Node *arg = node->args; arg; arg = arg->next_arg)
       gen(arg);
-      nargs++;
-    }
 
-    for (int i = nargs - 1; i >= 0; i--) {
+    for (int i = node->arg_count - 1; i >= 0; i--)
       printf("  pop %s\n", argreg[i]);
-    }
 
     printf("  call %s\n", node->funcname);
     if (need_align)
