@@ -10,6 +10,9 @@ int sub(int a, int b) { return a - b; }
 int add6(int a, int b, int c, int d, int e, int f) {
   return a + b + c + d + e + f;
 }
+int sub6(int a, int b, int c, int d, int e, int f) {
+  return a - b - c - d - e - f;
+}
 EOF
 
 assert() {
@@ -84,5 +87,6 @@ assert 10 'return print_args(10);'
 assert 2 'return add(1, 1);'
 assert 0 'return sub(1, 1);'
 assert 21 'return add6(1, 2, 3, 4, 5, 6);'
+assert 0 'return sub6(15, 5, 4, 3, 2, 1);'
 
 echo OK
