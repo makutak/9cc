@@ -111,6 +111,7 @@ struct Node {
 
   // function name
   char *funcname;
+  // function args
   Node *args;
   Node *next_arg;
 };
