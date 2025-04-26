@@ -7,7 +7,9 @@ int print5() { printf("5\n"); return 5; }
 int print_args(int a) { printf("a: %d\n", a); return a;}
 int add(int a, int b) { return a + b; }
 int sub(int a, int b) { return a - b; }
-int add6(int a, int b, int c, int d, int e, int f) { return a + b + c + d + e + f; }
+int add6(int a, int b, int c, int d, int e, int f) {
+  return a + b + c + d + e + f;
+}
 EOF
 
 assert() {
