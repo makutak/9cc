@@ -237,11 +237,10 @@ Node *func_args() {
   if (consume(")"))
     return NULL;
 
-  while (consume(",")) {
-    args = expr();
-  }
+  args = expr();
 
   expect(")");
+  // printf("args->val: %d\n", args->val);
   return args;
 }
 
@@ -264,7 +263,6 @@ Node *primary() {
       node->kind = ND_FUNCALL;
       node->funcname = strndup(tok->str, tok->len);
       node->args[0] = func_args();
-
       return node;
     }
 

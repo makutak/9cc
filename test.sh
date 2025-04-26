@@ -4,6 +4,7 @@ cat <<EOF | gcc -xc -c -o tmp2.o -
 #include <stdio.h>
 int print3() { printf("3\n"); return 3; }
 int print5() { printf("5\n"); return 5; }
+int print_args(int a) { printf("a: %d\n", a); return a;}
 EOF
 
 assert() {
@@ -74,5 +75,6 @@ assert 7 'while(1) {foo = 7; return foo;} return 0;'
 assert 7 'for(;;) {foo = 7; return foo;} return 0;'
 assert 3 'return print3();'
 assert 5 'return print5();'
+assert 10 'return print_args(10);'
 
 echo OK
