@@ -13,6 +13,13 @@ int add6(int a, int b, int c, int d, int e, int f) {
 int sub6(int a, int b, int c, int d, int e, int f) {
   return a - b - c - d - e - f;
 }
+int sum(int i, int j) {
+  int sum = 0;
+  for (i; i <= j; i++) {
+    sum = i + sum;
+  }
+  return sum;
+}
 EOF
 
 assert() {
@@ -88,5 +95,6 @@ assert 2 'return add(1, 1);'
 assert 0 'return sub(1, 1);'
 assert 21 'return add6(1, 2, 3, 4, 5, 6);'
 assert 0 'return sub6(15, 5, 4, 3, 2, 1);'
+assert 55 'return sum(1, 10);'
 
 echo OK
