@@ -232,20 +232,22 @@ Node *unary() {
 }
 
 // func_args = "(" (expr ("," expr)*)? ")"
-Node *func_args() {
+Node *func_args(Node *funcall) {
+  funcall->arg_count = 0;
   if (consume(")"))
     return NULL;
 
   Node *head = expr();
+  funcall->arg_count++;
   Node *cur = head;
 
   while (consume(",")) {
     cur->next_arg = expr();
     cur = cur->next_arg;
+    funcall->arg_count++;
   }
 
   expect(")");
-
   return head;
 }
 
@@ -267,7 +269,7 @@ Node *primary() {
     if (consume("(")) {
       node->kind = ND_FUNCALL;
       node->funcname = strndup(tok->str, tok->len);
-      node->args = func_args();
+      node->args = func_args(node);
       return node;
     }
 

@@ -114,6 +114,7 @@ struct Node {
   // function args
   Node *args;
   Node *next_arg;
+  int arg_count;
 };
 
 extern Node *code[100];
