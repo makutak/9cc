@@ -88,20 +88,24 @@ void gen(Node *node) {
     }
     return;
   case ND_FUNCALL:
-    int need_align = ((node->arg_count + 1) % 2) != 0;
-    if (need_align)
-      printf("  sub rsp, 8\n");
-
     for (Node *arg = node->args; arg; arg = arg->next_arg)
       gen(arg);
 
     for (int i = node->arg_count - 1; i >= 0; i--)
       printf("  pop %s\n", argreg[i]);
 
+    printf("  mov rax, rsp\n");
+    printf("  and rax, 15\n");
+    printf("  jnz .Lcall%d\n", seq);
+    printf("  mov rax, 0\n");
     printf("  call %s\n", node->funcname);
-    if (need_align)
-      printf("  add rsp, 8\n");
-
+    printf("  jmp .Lend%d\n", seq);
+    printf(".Lcall%d:\n", seq);
+    printf("  sub rsp, 8\n");
+    printf("  mov rax, 0\n");
+    printf("  call %s\n", node->funcname);
+    printf("  add rsp, 8\n");
+    printf(".Lend%d:\n", seq);
     printf("  push rax\n");
     return;
   }
