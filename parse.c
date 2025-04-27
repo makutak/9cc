@@ -254,6 +254,8 @@ Node *func_args(Node *funcall) {
   }
 
   expect(")");
+  cur->next_arg = NULL;
+
   return head;
 }
 
