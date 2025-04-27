@@ -108,7 +108,7 @@ struct Node {
   Node *init;
   Node *inc;
   // block {}
-  Node *block[100];
+  Node *block;
 
   // function name
   char *funcname;

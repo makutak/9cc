@@ -65,20 +65,18 @@ Node *stmt() {
   Node *node;
 
   if (consume("{")) {
-    int i = 0;
-    Node *block[100];
-
+    Node block_head = {};
+    block_head.next = NULL;
+    Node *cur = &block_head;
     while (!consume("}")) {
-      block[i++] = stmt();
+      cur->next = stmt();
+      cur = cur->next;
     }
-    block[i] = NULL;
+    cur->next = NULL;
 
     node = calloc(1, sizeof(Node));
     node->kind = ND_BLOCK;
-
-    for (int j = 0; j <= i; j++) {
-      node->block[j] = block[j];
-    }
+    node->block = block_head.next;
 
     return node;
   }
@@ -243,20 +241,23 @@ Node *func_args(Node *funcall) {
   if (consume(")"))
     return NULL;
 
-  Node *head = expr();
-  funcall->arg_count++;
-  Node *cur = head;
+  Node head = {};
+  head.next_arg = NULL;
+  Node *cur = &head;
 
-  while (consume(",")) {
+  while (!consume(")")) {
     cur->next_arg = expr();
     cur = cur->next_arg;
     funcall->arg_count++;
+
+    if (!consume(","))
+      break;
   }
 
   expect(")");
   cur->next_arg = NULL;
 
-  return head;
+  return head.next_arg;
 }
 
 // primary = num

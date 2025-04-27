@@ -80,9 +80,9 @@ void gen(Node *node) {
     return;
   case ND_BLOCK:
     // node->block[i] != NULLでなければループしてgen
-    for (int i = 0; node->block[i]; i++) {
-      gen(node->block[i]);
-      if (node->block[i]->kind != ND_RETURN) {
+    for (Node *block = node->block; block; block = block->next) {
+      gen(block);
+      if (block->kind != ND_RETURN) {
         printf("  pop rax\n");
       }
     }
