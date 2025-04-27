@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   // 結果はcodeに保存される
   user_input = argv[1];
   token = tokenize();
-  program();
+  Node *code = program();
 
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");
@@ -23,9 +23,9 @@ int main(int argc, char **argv) {
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, 208\n");
   // 先頭の式から順にコード生成
-  for (int i = 0; code[i]; i++) {
+  for (code; code; code = code->next) {
     // print_ast(code[i], 0);
-    gen(code[i]);
+    gen(code);
 
     // 式の評価結果としてスタックに一つの値が残っているはずなので、
     // スタックが溢れないようにポップしておく

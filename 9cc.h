@@ -95,6 +95,7 @@ typedef struct Node Node;
 // 抽象構文木のノードの型
 struct Node {
   NodeKind kind; // ノードの型
+  Node *next;    // 次のノード
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
   int val;       // kindがNU_NUMの場合のみ使う
@@ -117,9 +118,7 @@ struct Node {
   int arg_count;
 };
 
-extern Node *code[100];
-
-void program();
+Node *program();
 
 //
 // codegen.c

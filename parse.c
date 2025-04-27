@@ -23,7 +23,7 @@ LVar *find_lvar(Token *tok) {
   return NULL;
 }
 
-void program();
+Node *program();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -40,13 +40,19 @@ LVar *locals;
 int offset = 0;
 
 // program = stmt*
-void program() {
+Node *program() {
   locals = NULL;
 
-  int i = 0;
-  while (!at_eof())
-    code[i++] = stmt();
-  code[i] = NULL;
+  Node head;
+  head.next = NULL;
+  Node *cur = &head;
+  while (!at_eof()) {
+    cur->next = stmt();
+    cur = cur->next;
+  }
+  cur->next = NULL;
+
+  return head.next;
 }
 
 // stmt = exprt ";"
