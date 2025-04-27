@@ -108,7 +108,7 @@ bool is_alnum(char c) {
 // 入力文字列pをトークナイズしてそれを返す
 Token *tokenize() {
   char *p = user_input;
-  Token head;
+  Token head = {};
   head.next = NULL;
   Token *cur = &head;
 

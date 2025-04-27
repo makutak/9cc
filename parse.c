@@ -43,7 +43,7 @@ int offset = 0;
 Node *program() {
   locals = NULL;
 
-  Node head;
+  Node head = {};
   head.next = NULL;
   Node *cur = &head;
   while (!at_eof()) {
