@@ -9,8 +9,17 @@ int main(int argc, char **argv) {
   // トークナイズしてパースする
   user_input = argv[1];
   token = tokenize();
-  Function *fn = program();
-  codegen(fn);
+  Function *prog = program();
+  for (Function *fn = prog; fn; fn = fn->next) {
+    int offset = 0;
+    for (LVar *lvar = fn->locals; lvar; lvar = lvar->next) {
+      offset += 8;
+      lvar->var->offset = offset;
+    }
+    fn->stack_size = offset;
+  }
+
+  codegen(prog);
 
   return 0;
 }

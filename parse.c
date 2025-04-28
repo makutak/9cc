@@ -20,9 +20,9 @@ Node *new_node_num(int val) {
 
 // 変数を名前で検索する。見つからなかった場合はNULLを返す
 LVar *find_lvar(Token *tok) {
-  for (LVar *var = locals; var; var = var->next)
-    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
-      return var;
+  for (LVar *lvar = locals; lvar; lvar = lvar->next)
+    if (lvar->len == tok->len && !memcmp(tok->str, lvar->var->name, lvar->len))
+      return lvar;
   return NULL;
 }
 
@@ -312,15 +312,17 @@ Node *primary() {
     node->kind = ND_LVAR;
     LVar *lvar = find_lvar(tok);
     if (lvar) {
-      node->offset = lvar->offset;
+      node->var = lvar->var;
     } else {
       lvar = calloc(1, sizeof(LVar));
       lvar->next = locals;
-      lvar->name = tok->str;
       lvar->len = tok->len;
-      offset += 8;
-      lvar->offset = offset;
-      node->offset = lvar->offset;
+      Var *var = calloc(1, sizeof(Var));
+      var->name = tok->str;
+      // set lvar's var
+      lvar->var = var;
+      // set node var's var
+      node->var = var;
       locals = lvar;
     }
     return node;

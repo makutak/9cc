@@ -34,14 +34,19 @@ struct Token {
   int len;        // トークンの長さ
 };
 
+typedef struct Var Var;
+struct Var {
+  char *name; // 変数の名前
+  int offset; // RPBからのオフセット
+};
+
 typedef struct LVar LVar;
 
 // ローカル変数の型
 struct LVar {
   LVar *next; // 次の変数がNULL
-  char *name; // 変数の名前
-  int len;    // 名前の長さ
-  int offset; // RPBからのオフセット
+  Var *var;
+  int len; // 名前の長さ
 };
 
 void error(char *fmt, ...);
@@ -96,7 +101,7 @@ struct Node {
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
   int val;       // kindがNU_NUMの場合のみ使う
-  int offset;    // kindがND_LVARの場合のみ使う
+  Var *var;      // kindがND_LVARの場合のみ使う
 
   // "if", while, for  statement
   Node *cond;
@@ -127,6 +132,9 @@ struct Function {
 
   // ローカル変数
   LVar *locals;
+
+  // スタックサイズ
+  int stack_size;
 };
 
 Function *program();

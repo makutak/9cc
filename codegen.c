@@ -8,7 +8,7 @@ void gen_lval(Node *node) {
     error("代入の左辺値が変数ではありません");
 
   printf("  mov rax, rbp\n");
-  printf("  sub rax, %d\n", node->offset);
+  printf("  sub rax, %d\n", node->var->offset);
   printf("  push rax\n");
 }
 
@@ -67,11 +67,12 @@ void gen(Node *node) {
     if (node->init)
       gen(node->init);
     printf(".Lbegin%d:\n", seq);
-    if (node->cond)
+    if (node->cond) {
       gen(node->cond);
-    printf("  pop rax\n");
-    printf("  cmp rax, 0\n");
-    printf("  je .Lend%d\n", seq);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je .Lend%d\n", seq);
+    }
     gen(node->then);
     if (node->inc)
       gen(node->inc);
@@ -167,7 +168,7 @@ void codegen(Function *prog) {
     // 変数26個分の領域を確保する
     printf("  push rbp\n");
     printf("  mov rbp, rsp\n");
-    printf("  sub rsp, 208\n");
+    printf("  sub rsp, %d\n", fn->stack_size);
 
     // 先頭の式から順にコード生成
     for (Node *node = fn->node; node; node = node->next) {
@@ -197,7 +198,7 @@ void print_ast(Node *node, int depth) {
     printf("NUM: %d\n", node->val);
     return;
   case ND_LVAR:
-    printf("LVAR: offset=%d\n", node->offset);
+    printf("LVAR: offset=%d\n", node->var->offset);
     return;
   case ND_ASSIGN:
     printf("ASSIGN\n");
