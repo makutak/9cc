@@ -242,12 +242,12 @@ Node *func_args(Node *funcall) {
     return NULL;
 
   Node head = {};
-  head.next_arg = NULL;
+  head.next = NULL;
   Node *cur = &head;
 
   while (!consume(")")) {
-    cur->next_arg = expr();
-    cur = cur->next_arg;
+    cur->next = expr();
+    cur = cur->next;
     funcall->arg_count++;
 
     if (!consume(","))
@@ -255,9 +255,9 @@ Node *func_args(Node *funcall) {
   }
 
   expect(")");
-  cur->next_arg = NULL;
+  cur->next = NULL;
 
-  return head.next_arg;
+  return head.next;
 }
 
 // primary = num

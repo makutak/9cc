@@ -88,7 +88,7 @@ void gen(Node *node) {
     }
     return;
   case ND_FUNCALL:
-    for (Node *arg = node->args; arg; arg = arg->next_arg)
+    for (Node *arg = node->args; arg; arg = arg->next)
       gen(arg);
 
     for (int i = node->arg_count - 1; i >= 0; i--)

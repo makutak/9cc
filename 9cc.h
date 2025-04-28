@@ -114,7 +114,6 @@ struct Node {
   char *funcname;
   // function args
   Node *args;
-  Node *next_arg;
   int arg_count;
 };
 
