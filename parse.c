@@ -2,6 +2,17 @@
 
 VarList *locals;
 
+Var *push_var(char *name) {
+  Var *var = calloc(1, sizeof(Var));
+  var->name = name;
+
+  VarList *vl = calloc(1, sizeof(VarList));
+  vl->var = var;
+  vl->next = locals;
+  locals = vl;
+  return var;
+}
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
@@ -18,10 +29,13 @@ Node *new_node_num(int val) {
 }
 
 // ローカル変数を名前で検索する。見つからなかった場合はNULLを返す
-VarList *find_lvar(Token *tok) {
-  for (VarList *lvar = locals; lvar; lvar = lvar->next)
-    if (lvar->var->len == tok->len && !memcmp(tok->str, lvar->var->name, lvar->var->len))
-      return lvar;
+Var *find_var(Token *tok) {
+  for (VarList *vl = locals; vl; vl = vl->next) {
+    Var *var = vl->var;
+    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+      return var;
+  }
+
   return NULL;
 }
 
@@ -343,22 +357,13 @@ Node *primary() {
     }
 
     node->kind = ND_LVAR;
-    VarList *lvar = find_lvar(tok);
-    if (lvar) {
-      node->var = lvar->var;
-    } else {
-      lvar = calloc(1, sizeof(VarList));
-      lvar->next = locals;
-
-      Var *var = calloc(1, sizeof(Var));
-      var->name = tok->str;
+    Var *var = find_var(tok);
+    if (!var) {
+      var = push_var(strndup(tok->str, tok->len));
       var->len = tok->len;
-      // set lvar's var
-      lvar->var = var;
-      // set node var's var
-      node->var = var;
-      locals = lvar;
     }
+
+    node->var = var;
     return node;
   }
 
