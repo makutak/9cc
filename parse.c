@@ -1,5 +1,8 @@
 #include "9cc.h"
 
+LVar *locals;
+int offset = 0;
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
@@ -35,20 +38,17 @@ Node *mul();
 Node *unary();
 Node *primary();
 
-Node *code[100];
-LVar *locals;
-
-int offset = 0;
-
 // program = function*
 Function *program() {
   locals = NULL;
+
   Function head = {};
   head.next = NULL;
   Function *cur = &head;
   cur->next = calloc(1, sizeof(Function));
   cur->next->node = function();
   cur = cur->next;
+  cur->locals = locals;
   cur->next = NULL;
 
   return head.next;

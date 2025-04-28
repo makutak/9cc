@@ -62,9 +62,6 @@ extern char *user_input;
 // 現在着目しているトークン
 extern Token *token;
 
-// ローカル変数
-extern LVar *locals;
-
 //
 // parse.c
 //
@@ -120,8 +117,16 @@ struct Node {
 typedef struct Function Function;
 
 struct Function {
-  Node *node;
   Function *next;
+
+  // function name
+  char *name;
+
+  // body
+  Node *node;
+
+  // ローカル変数
+  LVar *locals;
 };
 
 Function *program();
