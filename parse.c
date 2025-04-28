@@ -32,7 +32,7 @@ Node *new_node_num(int val) {
 Var *find_var(Token *tok) {
   for (VarList *vl = locals; vl; vl = vl->next) {
     Var *var = vl->var;
-    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+    if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
       return var;
   }
 
@@ -73,11 +73,9 @@ Function *function() {
 
   Function *fn = calloc(1, sizeof(Function));
 
-  Token *tok = consume_ident();
-  fn->name = strndup(tok->str, tok->len);
-
+  fn->name = expect_ident();
   expect("(");
-  VarList *params = read_params();
+  fn->params = read_params();
   expect("{");
 
   Node head = {};
@@ -91,7 +89,6 @@ Function *function() {
   cur->next = NULL;
 
   fn->node = head.next;
-  fn->params = params;
   fn->locals = locals;
   fn->next = NULL;
 
@@ -106,19 +103,11 @@ VarList *read_params() {
   head.next = NULL;
   VarList *cur = &head;
 
-  int offset = 0;
   while (!consume(")")) {
-    Token *tok = consume_ident();
-    Var *var = calloc(1, sizeof(Var));
-    var->name = tok->str;
-    var->len = tok->len;
-    offset += 8;
-    var->offset = offset;
 
     cur->next = calloc(1, sizeof(VarList));
-    cur->next->var = var;
+    cur->next->var = push_var(expect_ident());
     cur = cur->next;
-
     if (!consume(",")) {
       break;
     }
@@ -126,6 +115,7 @@ VarList *read_params() {
 
   expect(")");
   cur->next = NULL;
+
   return head.next;
 }
 
@@ -358,10 +348,8 @@ Node *primary() {
 
     node->kind = ND_LVAR;
     Var *var = find_var(tok);
-    if (!var) {
+    if (!var)
       var = push_var(strndup(tok->str, tok->len));
-      var->len = tok->len;
-    }
 
     node->var = var;
     return node;

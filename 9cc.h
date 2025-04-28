@@ -38,7 +38,6 @@ typedef struct Var Var;
 // 変数の型
 struct Var {
   char *name; // 変数の名前
-  int len;    // 名前の長さ
   int offset; // RPBからのオフセット
 };
 
@@ -57,6 +56,7 @@ Token *consume_ident();
 bool consume_kind();
 void expect(char *op);
 int expect_number();
+char *expect_ident();
 bool at_eof();
 Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 Token *tokenize();
