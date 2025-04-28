@@ -24,6 +24,7 @@ LVar *find_lvar(Token *tok) {
 }
 
 Function *program();
+Node *function();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -39,23 +40,33 @@ LVar *locals;
 
 int offset = 0;
 
-// program = stmt*
+// program = function*
 Function *program() {
   locals = NULL;
-  Function *fn = calloc(1, sizeof(Function));
+  Function head = {};
+  head.next = NULL;
+  Function *cur = &head;
+  cur->next = calloc(1, sizeof(Function));
+  cur->next->node = function();
+  cur = cur->next;
+  cur->next = NULL;
 
+  return head.next;
+}
+
+// function = stmt*
+Node *function() {
   Node head = {};
   head.next = NULL;
   Node *cur = &head;
+
   while (!at_eof()) {
     cur->next = stmt();
     cur = cur->next;
   }
   cur->next = NULL;
 
-  fn->node = head.next;
-
-  return fn;
+  return head.next;
 }
 
 // stmt = exprt ";"

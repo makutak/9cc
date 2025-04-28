@@ -121,6 +121,7 @@ typedef struct Function Function;
 
 struct Function {
   Node *node;
+  Function *next;
 };
 
 Function *program();
