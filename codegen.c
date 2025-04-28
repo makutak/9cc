@@ -95,6 +95,7 @@ void gen(Node *node) {
     for (int i = node->arg_count - 1; i >= 0; i--)
       printf("  pop %s\n", argreg[i]);
 
+    int seq = labelseq++;
     printf("  mov rax, rsp\n");
     printf("  and rax, 15\n");
     printf("  jnz .Lcall%d\n", seq);
@@ -170,14 +171,16 @@ void codegen(Function *prog) {
     printf("  mov rbp, rsp\n");
     printf("  sub rsp, %d\n", fn->stack_size);
 
+    int i = 0;
+    for (VarList *vl = fn->params; vl; vl = vl->next) {
+      Var *var = vl->var;
+      printf("  mov [rbp-%d], %s\n", vl->var->offset, argreg[i++]);
+    }
+
     // 先頭の式から順にコード生成
     for (Node *node = fn->node; node; node = node->next) {
       // print_ast(code[i], 0);
       gen(node);
-
-      // 式の評価結果としてスタックに一つの値が残っているはずなので、
-      // スタックが溢れないようにポップしておく
-      printf("  pop rax\n");
     }
 
     // エピローグ

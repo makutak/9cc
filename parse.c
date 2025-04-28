@@ -27,6 +27,7 @@ VarList *find_lvar(Token *tok) {
 
 Function *program();
 Function *function();
+VarList *read_params();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -39,8 +40,6 @@ Node *primary();
 
 // program = function*
 Function *program() {
-  locals = NULL;
-
   Function head = {};
   head.next = NULL;
   Function *cur = &head;
@@ -53,15 +52,18 @@ Function *program() {
   return head.next;
 }
 
-// function = ident "(" ")" "{" stmt* "}"
+// function = ident "(" params? ")" "{" stmt* "}"
+// params = ident ("," ident)*
 Function *function() {
+  locals = NULL;
+
   Function *fn = calloc(1, sizeof(Function));
 
   Token *tok = consume_ident();
   fn->name = strndup(tok->str, tok->len);
 
   expect("(");
-  expect(")");
+  VarList *params = read_params();
   expect("{");
 
   Node head = {};
@@ -75,10 +77,42 @@ Function *function() {
   cur->next = NULL;
 
   fn->node = head.next;
+  fn->params = params;
   fn->locals = locals;
   fn->next = NULL;
 
   return fn;
+}
+
+VarList *read_params() {
+  if (consume(")"))
+    return NULL;
+
+  VarList head = {};
+  head.next = NULL;
+  VarList *cur = &head;
+
+  int offset = 0;
+  while (!consume(")")) {
+    Token *tok = consume_ident();
+    Var *var = calloc(1, sizeof(Var));
+    var->name = tok->str;
+    var->len = tok->len;
+    offset += 8;
+    var->offset = offset;
+
+    cur->next = calloc(1, sizeof(VarList));
+    cur->next->var = var;
+    cur = cur->next;
+
+    if (!consume(",")) {
+      break;
+    }
+  }
+
+  expect(")");
+  cur->next = NULL;
+  return head.next;
 }
 
 // stmt = exprt ";"

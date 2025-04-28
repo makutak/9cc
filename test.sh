@@ -90,11 +90,18 @@ assert 7 'main() { while(1) {foo = 7; return foo;} return 0; }'
 assert 7 'main() { for(;;) {foo = 7; return foo;} return 0; }'
 assert 3 'main() { return print3(); }'
 assert 5 'main() { return print5(); }'
-# assert 10 'return print_args(10);'
-# assert 2 'return add(1, 1);'
-# assert 0 'return sub(1, 1);'
-# assert 21 'return add6(1, 2, 3, 4, 5, 6);'
-# assert 0 'return sub6(15, 5, 4, 3, 2, 1);'
-# assert 55 'return sum(1, 10);'
+
+
+assert 10 'main() { return print_args(10); }'
+assert 2 'main() { return add(1, 1); }'
+assert 0 'main() { return sub(1, 1); }'
+assert 21 'main() { return add6(1, 2, 3, 4, 5, 6); }'
+assert 0 'main() { return sub6(15, 5, 4, 3, 2, 1); }'
+assert 55 'main() { return sum(1, 10); }'
+
+# assert 32 'main() { return ret32(); } ret32() { return 32; }'
+# assert 7 'main() { return add2(3,4); } add2(x,y) { return x+y; }'
+# assert 1 'main() { return sub2(4,3); } sub2(x,y) { return x-y; }'
+# assert 55 'main() { return fib(9); } fib(x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }'
 
 echo OK

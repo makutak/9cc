@@ -17,6 +17,8 @@ int main(int argc, char **argv) {
       lvar->var->offset = offset;
     }
     fn->stack_size = offset;
+
+    /* print_ast(fn->node, 0); */
   }
 
   codegen(prog);
