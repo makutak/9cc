@@ -27,7 +27,7 @@ LVar *find_lvar(Token *tok) {
 }
 
 Function *program();
-Node *function();
+Function *function();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -45,28 +45,41 @@ Function *program() {
   Function head = {};
   head.next = NULL;
   Function *cur = &head;
-  cur->next = calloc(1, sizeof(Function));
-  cur->next->node = function();
-  cur = cur->next;
-  cur->locals = locals;
-  cur->next = NULL;
-
-  return head.next;
-}
-
-// function = stmt*
-Node *function() {
-  Node head = {};
-  head.next = NULL;
-  Node *cur = &head;
-
   while (!at_eof()) {
-    cur->next = stmt();
+    cur->next = function();
     cur = cur->next;
   }
   cur->next = NULL;
 
   return head.next;
+}
+
+// function = ident "(" ")" "{" stmt* "}"
+Function *function() {
+  Function *fn = calloc(1, sizeof(Function));
+
+  Token *tok = consume_ident();
+  fn->name = strndup(tok->str, tok->len);
+
+  expect("(");
+  expect(")");
+  expect("{");
+
+  Node head = {};
+  head.next = NULL;
+  Node *cur = &head;
+
+  while (!consume("}")) {
+    cur->next = stmt();
+    cur = cur->next;
+  }
+  cur->next = NULL;
+
+  fn->node = head.next;
+  fn->locals = locals;
+  fn->next = NULL;
+
+  return fn;
 }
 
 // stmt = exprt ";"

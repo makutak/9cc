@@ -135,5 +135,5 @@ Function *program();
 // codegen.c
 //
 void gen(Node *node);
-void codegen(Node *node);
+void codegen(Function *prog);
 void print_ast(Node *node, int depth);
