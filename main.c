@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   Function *prog = program();
   for (Function *fn = prog; fn; fn = fn->next) {
     int offset = 0;
-    for (LVar *lvar = fn->locals; lvar; lvar = lvar->next) {
+    for (VarList *lvar = fn->locals; lvar; lvar = lvar->next) {
       offset += 8;
       lvar->var->offset = offset;
     }

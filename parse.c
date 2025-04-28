@@ -1,6 +1,6 @@
 #include "9cc.h"
 
-LVar *locals;
+VarList *locals;
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
@@ -17,10 +17,10 @@ Node *new_node_num(int val) {
   return node;
 }
 
-// 変数を名前で検索する。見つからなかった場合はNULLを返す
-LVar *find_lvar(Token *tok) {
-  for (LVar *lvar = locals; lvar; lvar = lvar->next)
-    if (lvar->len == tok->len && !memcmp(tok->str, lvar->var->name, lvar->len))
+// ローカル変数を名前で検索する。見つからなかった場合はNULLを返す
+VarList *find_lvar(Token *tok) {
+  for (VarList *lvar = locals; lvar; lvar = lvar->next)
+    if (lvar->var->len == tok->len && !memcmp(tok->str, lvar->var->name, lvar->var->len))
       return lvar;
   return NULL;
 }
@@ -309,15 +309,16 @@ Node *primary() {
     }
 
     node->kind = ND_LVAR;
-    LVar *lvar = find_lvar(tok);
+    VarList *lvar = find_lvar(tok);
     if (lvar) {
       node->var = lvar->var;
     } else {
-      lvar = calloc(1, sizeof(LVar));
+      lvar = calloc(1, sizeof(VarList));
       lvar->next = locals;
-      lvar->len = tok->len;
+
       Var *var = calloc(1, sizeof(Var));
       var->name = tok->str;
+      var->len = tok->len;
       // set lvar's var
       lvar->var = var;
       // set node var's var

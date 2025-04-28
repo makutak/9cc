@@ -35,18 +35,19 @@ struct Token {
 };
 
 typedef struct Var Var;
+// 変数の型
 struct Var {
   char *name; // 変数の名前
+  int len;    // 名前の長さ
   int offset; // RPBからのオフセット
 };
 
-typedef struct LVar LVar;
+typedef struct VarList VarList;
 
-// ローカル変数の型
-struct LVar {
-  LVar *next; // 次の変数がNULL
+// 変数のリスト
+struct VarList {
+  VarList *next; // 次の変数がNULL
   Var *var;
-  int len; // 名前の長さ
 };
 
 void error(char *fmt, ...);
@@ -126,12 +127,14 @@ struct Function {
 
   // function name
   char *name;
+  // params
+  VarList *params;
 
   // body
   Node *node;
 
   // ローカル変数
-  LVar *locals;
+  VarList *locals;
 
   // スタックサイズ
   int stack_size;
