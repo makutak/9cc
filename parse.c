@@ -346,11 +346,11 @@ Node *primary() {
       return node;
     }
 
-    node->kind = ND_LVAR;
     Var *var = find_var(tok);
     if (!var)
       var = push_var(strndup(tok->str, tok->len));
 
+    node->kind = ND_VAR;
     node->var = var;
     return node;
   }

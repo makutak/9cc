@@ -83,7 +83,7 @@ typedef enum {
   ND_LT,     // <
   ND_LE,     // <=
   ND_ASSIGN, // =
-  ND_LVAR,   // ローカル変数
+  ND_VAR,    // 変数
   ND_NUM,    // 整数
   ND_RETURN, // return
   ND_IF,     // if
@@ -102,7 +102,7 @@ struct Node {
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
   int val;       // kindがNU_NUMの場合のみ使う
-  Var *var;      // kindがND_LVARの場合のみ使う
+  Var *var;      // kindがND_VARの場合のみ使う
 
   // "if", while, for  statement
   Node *cond;

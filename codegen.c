@@ -3,8 +3,8 @@
 int labelseq = 0;
 static char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
-void gen_lval(Node *node) {
-  if (node->kind != ND_LVAR)
+void gen_var(Node *node) {
+  if (node->kind != ND_VAR)
     error("代入の左辺値が変数ではありません");
 
   printf("  mov rax, rbp\n");
@@ -27,14 +27,14 @@ void gen(Node *node) {
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;
-  case ND_LVAR:
-    gen_lval(node);
+  case ND_VAR:
+    gen_var(node);
     printf("  pop rax\n");
     printf("  mov rax, [rax]\n");
     printf("  push rax\n");
     return;
   case ND_ASSIGN:
-    gen_lval(node->lhs);
+    gen_var(node->lhs);
     gen(node->rhs);
     printf("  pop rdi\n");
     printf("  pop rax\n");
@@ -200,8 +200,8 @@ void print_ast(Node *node, int depth) {
   case ND_NUM:
     printf("NUM: %d\n", node->val);
     return;
-  case ND_LVAR:
-    printf("LVAR: offset=%d\n", node->var->offset);
+  case ND_VAR:
+    printf("VAR: offset=%d\n", node->var->offset);
     return;
   case ND_ASSIGN:
     printf("ASSIGN\n");
@@ -244,7 +244,7 @@ void print_ast(Node *node, int depth) {
     break;
   }
 
-  // ND_NUM や ND_LVAR のように左右の子を持たないノードでは再帰しない
+  // ND_NUM や ND_VAR のように左右の子を持たないノードでは再帰しない
   if (node->lhs)
     print_ast(node->lhs, depth + 1);
   if (node->rhs)
