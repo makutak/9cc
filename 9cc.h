@@ -117,7 +117,13 @@ struct Node {
   int arg_count;
 };
 
-Node *program();
+typedef struct Function Function;
+
+struct Function {
+  Node *node;
+};
+
+Function *program();
 
 //
 // codegen.c

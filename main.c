@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   // 結果はcodeに保存される
   user_input = argv[1];
   token = tokenize();
-  Node *code = program();
+  Function *fn = program();
 
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, 208\n");
   // 先頭の式から順にコード生成
-  for (code; code; code = code->next) {
+  for (Node *code = fn->node; code; code = code->next) {
     // print_ast(code[i], 0);
     gen(code);
 
