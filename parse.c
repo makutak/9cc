@@ -1,7 +1,6 @@
 #include "9cc.h"
 
 LVar *locals;
-int offset = 0;
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
