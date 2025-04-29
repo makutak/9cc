@@ -15,8 +15,17 @@ int main(int argc, char **argv) {
     for (VarList *lvar = fn->locals; lvar; lvar = lvar->next) {
       offset += 8;
       lvar->var->offset = offset;
+      /* printf("locals->var->offset: %d %p\n", lvar->var->offset, &lvar->var->offset); */
+      /* printf("locals->var->name: %s\n", lvar->var->name); */
+      /* printf("\n"); */
     }
     fn->stack_size = offset;
+
+    /* for (VarList *lv = fn->params; lv; lv = lv->next) { */
+    /*   printf("params->var->offset: %d %p \n", lv->var->offset, &lv->var->offset); */
+    /*   printf("params->var->name: %s %p \n", lv->var->name, &lv->var->offset); */
+    /*   printf("\n"); */
+    /* } */
 
     /* print_ast(fn->node, 0); */
   }

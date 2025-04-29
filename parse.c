@@ -13,6 +13,19 @@ Var *push_var(char *name) {
   return var;
 }
 
+Var *create_var(char *name) {
+  Var *var = calloc(1, sizeof(Var));
+  var->name = name;
+  return var;
+}
+
+void register_local(Var *var) {
+  VarList *vl = calloc(1, sizeof(VarList));
+  vl->var = var;
+  vl->next = locals;
+  locals = vl;
+}
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
@@ -106,7 +119,9 @@ VarList *read_params() {
   while (!consume(")")) {
 
     cur->next = calloc(1, sizeof(VarList));
-    cur->next->var = push_var(expect_ident());
+    Var *var = create_var(expect_ident());
+    cur->next->var = var;
+    register_local(var);
     cur = cur->next;
     if (!consume(",")) {
       break;
@@ -347,8 +362,10 @@ Node *primary() {
     }
 
     Var *var = find_var(tok);
-    if (!var)
-      var = push_var(strndup(tok->str, tok->len));
+    if (!var) {
+      var = create_var(strndup(tok->str, tok->len));
+      register_local(var);
+    }
 
     node->kind = ND_VAR;
     node->var = var;
