@@ -45,7 +45,7 @@ typedef struct VarList VarList;
 
 // 変数のリスト
 struct VarList {
-  VarList *next; // 次の変数がNULL
+  VarList *next;
   Var *var;
 };
 
@@ -117,6 +117,7 @@ struct Node {
   char *funcname;
   // function args
   Node *args;
+  // function args count
   int arg_count;
 };
 

@@ -242,6 +242,9 @@ void print_ast(Node *node, int depth) {
   case ND_FOR:
     printf("FOR\n");
     break;
+  case ND_BLOCK:
+    printf("BLOCK\n");
+    break;
   }
 
   // ND_NUM や ND_VAR のように左右の子を持たないノードでは再帰しない
