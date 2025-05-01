@@ -3,13 +3,15 @@
 int labelseq = 0;
 static char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
-void gen_var(Node *node) {
-  if (node->kind != ND_VAR)
-    error("代入の左辺値が変数ではありません");
-
-  printf("  mov rax, rbp\n");
-  printf("  sub rax, %d\n", node->var->offset);
-  printf("  push rax\n");
+void gen_lval(Node *node) {
+  switch (node->kind) {
+  case ND_VAR:
+    printf("  mov rax, rbp\n");
+    printf("  sub rax, %d\n", node->var->offset);
+    printf("  push rax\n");
+    return;
+  }
+  error("代入の左辺値が変数ではありません");
 }
 
 void gen(Node *node) {
@@ -28,13 +30,13 @@ void gen(Node *node) {
     printf("  push %d\n", node->val);
     return;
   case ND_VAR:
-    gen_var(node);
+    gen_lval(node);
     printf("  pop rax\n");
     printf("  mov rax, [rax]\n");
     printf("  push rax\n");
     return;
   case ND_ASSIGN:
-    gen_var(node->lhs);
+    gen_lval(node->lhs);
     gen(node->rhs);
     printf("  pop rdi\n");
     printf("  pop rax\n");
