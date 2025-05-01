@@ -10,6 +10,9 @@ void gen_lval(Node *node) {
     printf("  sub rax, %d\n", node->var->offset);
     printf("  push rax\n");
     return;
+  case ND_DEREF:
+    gen(node->lhs);
+    return;
   }
   error("代入の左辺値が変数ではありません");
 }
@@ -112,6 +115,15 @@ void gen(Node *node) {
     printf(".Lend%d:\n", seq);
     printf("  push rax\n");
     return;
+  case ND_ADDR:
+    gen_lval(node->lhs);
+    return;
+  case ND_DEREF:
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  mov rax, [rax]\n");
+    printf("  push rax\n");
+    return;
   }
 
   gen(node->lhs);
@@ -181,7 +193,7 @@ void codegen(Function *prog) {
 
     // 先頭の式から順にコード生成
     for (Node *node = fn->node; node; node = node->next) {
-      // print_ast(code[i], 0);
+      /* print_ast(node, 0); */
       gen(node);
     }
 
@@ -246,6 +258,12 @@ void print_ast(Node *node, int depth) {
     break;
   case ND_BLOCK:
     printf("BLOCK\n");
+    break;
+  case ND_ADDR:
+    printf("ADDR\n");
+    break;
+  case ND_DEREF:
+    printf("DEREF\n");
     break;
   }
 
