@@ -134,7 +134,7 @@ VarList *read_params() {
   return head.next;
 }
 
-// stmt = exprt ";"
+// stmt = expr ";"
 //      | "{" stmt* "}"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
 //      | "while" "(" expr ")" stmt
