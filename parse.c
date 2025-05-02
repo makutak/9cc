@@ -308,22 +308,21 @@ Node *mul() {
 //       | "*" unary
 //       | "&" unary
 Node *unary() {
-
   if (consume("+"))
     return unary();
   if (consume("-"))
     return new_node(ND_SUB, new_node_num(0), unary());
 
-  if (consume("*")) {
+  if (consume("&")) {
     Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_DEREF;
+    node->kind = ND_ADDR;
     node->lhs = unary();
     return node;
   }
 
-  if (consume("&")) {
+  if (consume("*")) {
     Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_ADDR;
+    node->kind = ND_DEREF;
     node->lhs = unary();
     return node;
   }
