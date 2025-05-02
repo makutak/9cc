@@ -360,6 +360,19 @@ Node *func_args(Node *funcall) {
 //         | ident func_args?
 //         | "(" expr ")"
 Node *primary() {
+  if (consume("int")) {
+    // 新しい変数宣言
+    Node *node = calloc(1, sizeof(Node));
+    Token *tok = consume_ident();
+    if (!tok)
+      error_at(token->str, "変数名が必要です");
+    Var *var = create_var(strndup(tok->str, tok->len));
+    register_local(var);
+    node->kind = ND_VAR;
+    node->var = var;
+    return node;
+  }
+
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume("(")) {
     Node *node = expr();
@@ -384,21 +397,8 @@ Node *primary() {
     node->kind = ND_VAR;
     node->var = var;
     return node;
-  } else {
-
-    // local var
-    if (consume("int")) {
-      // declare
-      Node *node = calloc(1, sizeof(Node));
-      Token *tok = consume_ident();
-      Var *var = create_var(strndup(tok->str, tok->len));
-      register_local(var);
-      node->kind = ND_VAR;
-      node->var = var;
-      return node;
-    }
   }
 
-  // そうでなければ数値のはず
+  // それ以外は数値リテラル
   return new_node_num(expect_number());
 }
