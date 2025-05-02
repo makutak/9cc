@@ -360,9 +360,10 @@ Node *func_args(Node *funcall) {
 //         | ident func_args?
 //         | "(" expr ")"
 Node *primary() {
+  Node *node = calloc(1, sizeof(Node));
+
   if (consume("int")) {
     // 新しい変数宣言
-    Node *node = calloc(1, sizeof(Node));
     Token *tok = consume_ident();
     if (!tok)
       error_at(token->str, "変数名が必要です");
@@ -382,15 +383,14 @@ Node *primary() {
 
   Token *tok = consume_ident();
   if (tok) {
-    Node *node = calloc(1, sizeof(Node));
-
-    // funcall
+    // 関数呼び出し
     if (consume("(")) {
       node->kind = ND_FUNCALL;
       node->funcname = strndup(tok->str, tok->len);
       node->args = func_args(node);
       return node;
     }
+    // 変数使用
     Var *var = find_var(tok);
     if (!var)
       error_at(tok->str, "宣言されていない変数です");
