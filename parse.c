@@ -41,6 +41,28 @@ Node *new_node_num(int val) {
   return node;
 }
 
+Node *new_unary(NodeKind kind, Node *lhs) {
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = kind;
+  node->lhs = lhs;
+  return node;
+}
+
+Node *new_var_node(Var *var) {
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_VAR;
+  node->var = var;
+  return node;
+}
+
+Node *new_funcall_node(char *funcname, Node *args) {
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_FUNCALL;
+  node->funcname = funcname;
+  node->args = args;
+  return node;
+}
+
 // ローカル変数を名前で検索する。見つからなかった場合はNULLを返す
 Var *find_var(Token *tok) {
   for (VarList *vl = locals; vl; vl = vl->next) {
@@ -314,26 +336,17 @@ Node *unary() {
   if (consume("-"))
     return new_node(ND_SUB, new_node_num(0), unary());
 
-  if (consume("&")) {
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_ADDR;
-    node->lhs = unary();
-    return node;
-  }
+  if (consume("&"))
+    return new_unary(ND_ADDR, unary());
 
-  if (consume("*")) {
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_DEREF;
-    node->lhs = unary();
-    return node;
-  }
+  if (consume("*"))
+    return new_unary(ND_DEREF, unary());
 
   return primary();
 }
 
 // func_args = "(" (expr ("," expr)*)? ")"
-Node *func_args(Node *funcall) {
-  funcall->arg_count = 0;
+Node *func_args() {
   if (consume(")"))
     return NULL;
 
@@ -344,7 +357,6 @@ Node *func_args(Node *funcall) {
   while (!consume(")")) {
     cur->next = expr();
     cur = cur->next;
-    funcall->arg_count++;
 
     if (!consume(","))
       break;
@@ -360,8 +372,6 @@ Node *func_args(Node *funcall) {
 //         | ident func_args?
 //         | "(" expr ")"
 Node *primary() {
-  Node *node = calloc(1, sizeof(Node));
-
   if (consume("int")) {
     // 新しい変数宣言
     Token *tok = consume_ident();
@@ -369,9 +379,7 @@ Node *primary() {
       error_at(token->str, "変数名が必要です");
     Var *var = create_var(strndup(tok->str, tok->len));
     register_local(var);
-    node->kind = ND_VAR;
-    node->var = var;
-    return node;
+    return new_var_node(var);
   }
 
   // 次のトークンが"("なら、"(" expr ")" のはず
@@ -385,18 +393,13 @@ Node *primary() {
   if (tok) {
     // 関数呼び出し
     if (consume("(")) {
-      node->kind = ND_FUNCALL;
-      node->funcname = strndup(tok->str, tok->len);
-      node->args = func_args(node);
-      return node;
+      return new_funcall_node(strndup(tok->str, tok->len), func_args());
     }
     // 変数使用
     Var *var = find_var(tok);
     if (!var)
       error_at(tok->str, "宣言されていない変数です");
-    node->kind = ND_VAR;
-    node->var = var;
-    return node;
+    return new_var_node(var);
   }
 
   // それ以外は数値リテラル

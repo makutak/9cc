@@ -119,8 +119,6 @@ struct Node {
   char *funcname;
   // function args
   Node *args;
-  // function args count
-  int arg_count;
 };
 
 typedef struct Function Function;

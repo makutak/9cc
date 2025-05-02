@@ -94,10 +94,13 @@ void gen(Node *node) {
     }
     return;
   case ND_FUNCALL:
-    for (Node *arg = node->args; arg; arg = arg->next)
+    int arg_count = 0;
+    for (Node *arg = node->args; arg; arg = arg->next) {
       gen(arg);
+      arg_count++;
+    }
 
-    for (int i = node->arg_count - 1; i >= 0; i--)
+    for (int i = arg_count - 1; i >= 0; i--)
       printf("  pop %s\n", argreg[i]);
 
     int seq = labelseq++;
