@@ -127,6 +127,12 @@ Token *tokenize() {
       continue;
     }
 
+    if (strncmp(p, "int", 3) == 0 && !is_alnum(p[3])) {
+      cur = new_token(TK_RESERVED, cur, p, 3);
+      p += 3;
+      continue;
+    }
+
     if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
       cur = new_token(TK_RETURN, cur, p, 6);
       p += 6;

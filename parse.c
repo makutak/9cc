@@ -85,7 +85,7 @@ Function *function() {
   locals = NULL;
 
   Function *fn = calloc(1, sizeof(Function));
-
+  expect("int");
   fn->name = expect_ident();
   expect("(");
   fn->params = read_params();
@@ -117,6 +117,7 @@ VarList *read_params() {
   VarList *cur = &head;
 
   while (!consume(")")) {
+    expect("int");
 
     cur->next = calloc(1, sizeof(VarList));
     Var *var = create_var(expect_ident());
@@ -370,22 +371,32 @@ Node *primary() {
   if (tok) {
     Node *node = calloc(1, sizeof(Node));
 
+    // funcall
     if (consume("(")) {
       node->kind = ND_FUNCALL;
       node->funcname = strndup(tok->str, tok->len);
       node->args = func_args(node);
       return node;
     }
-
     Var *var = find_var(tok);
-    if (!var) {
-      var = create_var(strndup(tok->str, tok->len));
-      register_local(var);
-    }
-
+    if (!var)
+      error_at(tok->str, "宣言されていない変数です");
     node->kind = ND_VAR;
     node->var = var;
     return node;
+  } else {
+
+    // local var
+    if (consume("int")) {
+      // declare
+      Node *node = calloc(1, sizeof(Node));
+      Token *tok = consume_ident();
+      Var *var = create_var(strndup(tok->str, tok->len));
+      register_local(var);
+      node->kind = ND_VAR;
+      node->var = var;
+      return node;
+    }
   }
 
   // そうでなければ数値のはず
