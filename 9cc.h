@@ -51,6 +51,7 @@ struct VarList {
 
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
+Token *peek(char *op);
 bool consume(char *op);
 Token *consume_ident();
 bool consume_kind();

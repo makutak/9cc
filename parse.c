@@ -268,7 +268,7 @@ Node *stmt() {
     return node;
   }
 
-  if (!memcmp(token->str, "int", token->len) && strlen("int") == token->len) {
+  if (peek("int")) {
     return declaration();
   }
 
