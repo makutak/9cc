@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct Type Type;
+
 //
 // tokenize.c
 //
@@ -33,6 +35,7 @@ typedef struct Var Var;
 struct Var {
   char *name; // 変数の名前
   int offset; // RPBからのオフセット
+  Type *ty;
 };
 
 typedef struct VarList VarList;
@@ -135,10 +138,11 @@ struct Function {
   int stack_size;
 };
 
-typedef struct Type Type;
+typedef enum { TY_INT, TY_PTR } TypeKind;
+
 struct Type {
-  enum { INT, PTR } ty;
-  struct Type *ptr_to;
+  TypeKind kind;
+  Type *ptr_to;
 };
 
 Function *program();
