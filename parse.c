@@ -166,7 +166,7 @@ VarList *read_params() {
   return head.next;
 }
 
-// declaration = basetype ident
+// declaration = basetype ident ("=" expr) ";"
 Node *declaration() {
   basetype();
   // 新しい変数宣言
@@ -175,8 +175,14 @@ Node *declaration() {
     error_at(token->str, "変数名が必要です");
   Var *var = create_var(strndup(tok->str, tok->len));
   register_local(var);
+  if (consume(";"))
+    return new_var_node(var);
+
+  expect("=");
+  Node *lhs = new_var_node(var);
+  Node *rhs = expr();
   expect(";");
-  return new_var_node(var);
+  return new_node(ND_ASSIGN, lhs, rhs);
 }
 
 // stmt = expr ";"
