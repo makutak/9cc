@@ -206,7 +206,7 @@ Node *stmt() {
     return node;
   }
 
-  if (consume_kind(TK_IF)) {
+  if (consume("if")) {
     expect("(");
     Node *cond = expr();
     expect(")");
@@ -218,14 +218,14 @@ Node *stmt() {
     node->cond = cond;
     node->then = then;
 
-    if (consume_kind(TK_ELSE)) {
+    if (consume("else")) {
       node->els = stmt();
     }
 
     return node;
   }
 
-  if (consume_kind(TK_WHILE)) {
+  if (consume("while")) {
     expect("(");
     Node *cond = expr();
     expect(")");
@@ -239,7 +239,7 @@ Node *stmt() {
     return node;
   }
 
-  if (consume_kind(TK_FOR)) {
+  if (consume("for")) {
     node = calloc(1, sizeof(Node));
     node->kind = ND_FOR;
     expect("(");
@@ -260,7 +260,7 @@ Node *stmt() {
     return node;
   }
 
-  if (consume_kind(TK_RETURN)) {
+  if (consume("return")) {
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
     node->lhs = expr();

@@ -41,14 +41,15 @@ Token *peek(char *s) {
   return token;
 }
 
-// 次のトークンが期待している記号のときには、トークンを1つ読み進めて
-// 真を返す。それ以外の場合には偽を返す。
-bool consume(char *op) {
-  if (!peek(op))
-    return false;
+// 現在のトークンが指定した文字列と一致していれば、そのトークンを返す。
+// 一致していれば同時にトークンを1つ進める。一致しなければNULLを返す。
+Token *consume(char *s) {
+  if (!peek(s))
+    return NULL;
 
+  Token *t = token;
   token = token->next;
-  return true;
+  return t;
 }
 
 Token *consume_ident() {
@@ -141,31 +142,31 @@ Token *tokenize() {
     }
 
     if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
-      cur = new_token(TK_RETURN, cur, p, 6);
+      cur = new_token(TK_RESERVED, cur, p, 6);
       p += 6;
       continue;
     }
 
     if (strncmp(p, "if", 2) == 0 && !is_alnum(p[2])) {
-      cur = new_token(TK_IF, cur, p, 2);
+      cur = new_token(TK_RESERVED, cur, p, 2);
       p += 2;
       continue;
     }
 
     if (strncmp(p, "else", 4) == 0 && !is_alnum(p[4])) {
-      cur = new_token(TK_ELSE, cur, p, 4);
+      cur = new_token(TK_RESERVED, cur, p, 4);
       p += 4;
       continue;
     }
 
     if (strncmp(p, "while", 5) == 0 && !is_alnum(p[5])) {
-      cur = new_token(TK_WHILE, cur, p, 5);
+      cur = new_token(TK_RESERVED, cur, p, 5);
       p += 5;
       continue;
     }
 
     if (strncmp(p, "for", 3) == 0 && !is_alnum(p[3])) {
-      cur = new_token(TK_FOR, cur, p, 3);
+      cur = new_token(TK_RESERVED, cur, p, 3);
       p += 3;
       continue;
     }
