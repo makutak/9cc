@@ -141,6 +141,12 @@ struct Function {
   int stack_size;
 };
 
+typedef struct Type Type;
+struct Type {
+  enum { INT, PTR } ty;
+  struct Type *ptr_to;
+};
+
 Function *program();
 
 //

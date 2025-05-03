@@ -77,6 +77,7 @@ Var *find_var(Token *tok) {
 Function *program();
 Function *function();
 VarList *read_params();
+Node *declaration();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -101,13 +102,21 @@ Function *program() {
   return head.next;
 }
 
+// basetype = "int" "*"*
+Type *basetype() {
+  Type *type = calloc(1, sizeof(Type));
+  expect("int");
+  type->ty = INT;
+  return type;
+}
+
 // function = ident "(" params? ")" "{" stmt* "}"
-// params = ident ("," ident)*
+// params = basetype ident ("," basetype ident)*
 Function *function() {
   locals = NULL;
 
   Function *fn = calloc(1, sizeof(Function));
-  expect("int");
+  basetype();
   fn->name = expect_ident();
   expect("(");
   fn->params = read_params();
@@ -139,7 +148,7 @@ VarList *read_params() {
   VarList *cur = &head;
 
   while (!consume(")")) {
-    expect("int");
+    basetype();
 
     cur->next = calloc(1, sizeof(VarList));
     Var *var = create_var(expect_ident());
@@ -157,12 +166,26 @@ VarList *read_params() {
   return head.next;
 }
 
+// declaration = basetype ident
+Node *declaration() {
+  basetype();
+  // 新しい変数宣言
+  Token *tok = consume_ident();
+  if (!tok)
+    error_at(token->str, "変数名が必要です");
+  Var *var = create_var(strndup(tok->str, tok->len));
+  register_local(var);
+  expect(";");
+  return new_var_node(var);
+}
+
 // stmt = expr ";"
 //      | "{" stmt* "}"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
 //      | "while" "(" expr ")" stmt
 //      | "for" "(" expr? ";" "expr? "; expr? ")" stmt
 //      | "return" expr ";"
+//      | declaration
 Node *stmt() {
   Node *node;
 
@@ -219,7 +242,6 @@ Node *stmt() {
   if (consume_kind(TK_FOR)) {
     node = calloc(1, sizeof(Node));
     node->kind = ND_FOR;
-
     expect("(");
     if (!consume(";")) {
       node->init = expr();
@@ -233,7 +255,6 @@ Node *stmt() {
       node->inc = expr();
       expect(")");
     }
-
     node->then = stmt();
 
     return node;
@@ -243,9 +264,15 @@ Node *stmt() {
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
     node->lhs = expr();
-  } else {
-    node = expr();
+    expect(";");
+    return node;
   }
+
+  if (!memcmp(token->str, "int", token->len) && strlen("int") == token->len) {
+    return declaration();
+  }
+
+  node = expr();
 
   if (!consume(";"))
     error_at(token->str, "';'ではないトークンです");
@@ -372,16 +399,6 @@ Node *func_args() {
 //         | ident func_args?
 //         | "(" expr ")"
 Node *primary() {
-  if (consume("int")) {
-    // 新しい変数宣言
-    Token *tok = consume_ident();
-    if (!tok)
-      error_at(token->str, "変数名が必要です");
-    Var *var = create_var(strndup(tok->str, tok->len));
-    register_local(var);
-    return new_var_node(var);
-  }
-
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume("(")) {
     Node *node = expr();
