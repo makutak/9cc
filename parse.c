@@ -107,9 +107,8 @@ Function *program() {
 Type *basetype() {
   expect("int");
   Type *type = int_type();
-  while (consume("*")) {
+  while (consume("*"))
     type = pointer_to(type);
-  }
 
   return type;
 }
@@ -120,7 +119,7 @@ Function *function() {
   locals = NULL;
 
   Function *fn = calloc(1, sizeof(Function));
-  Type *ty = basetype();
+  basetype();
   fn->name = expect_ident();
   expect("(");
   fn->params = read_params();
@@ -152,10 +151,10 @@ VarList *read_params() {
   VarList *cur = &head;
 
   while (!consume(")")) {
-    Type *ty = basetype();
+    Type *type = basetype();
 
     cur->next = calloc(1, sizeof(VarList));
-    Var *var = create_var(expect_ident(), ty);
+    Var *var = create_var(expect_ident(), type);
     cur->next->var = var;
     register_local(var);
     cur = cur->next;
@@ -173,12 +172,12 @@ VarList *read_params() {
 // declaration = basetype ident ("=" expr) ";"
 Node *declaration() {
   // 新しい変数宣言
-  Type *ty = basetype();
+  Type *type = basetype();
   Token *tok = consume_ident();
   if (!tok)
     error_at(token->str, "変数名が必要です");
 
-  Var *var = create_var(strndup(tok->str, tok->len), ty);
+  Var *var = create_var(strndup(tok->str, tok->len), type);
   register_local(var);
   if (consume(";"))
     return new_var_node(var);
