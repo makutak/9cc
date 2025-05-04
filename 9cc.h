@@ -144,7 +144,7 @@ struct Function {
 Function *program();
 
 //
-// typing.c
+// type.c
 //
 
 typedef enum { TY_INT, TY_PTR } TypeKind;
