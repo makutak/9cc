@@ -103,19 +103,6 @@ Function *program() {
   return head.next;
 }
 
-Type *int_type() {
-  Type *type = calloc(1, sizeof(Type));
-  type->kind = TY_INT;
-  return type;
-}
-
-Type *pointer_to(Type *base) {
-  Type *type = calloc(1, sizeof(Type));
-  type->kind = TY_PTR;
-  type->ptr_to = base;
-  return type;
-}
-
 // basetype = "int" "*"*
 Type *basetype() {
   expect("int");

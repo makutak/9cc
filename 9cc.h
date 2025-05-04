@@ -138,14 +138,21 @@ struct Function {
   int stack_size;
 };
 
+Function *program();
+
+//
+// typing.c
+//
+
 typedef enum { TY_INT, TY_PTR } TypeKind;
 
 struct Type {
   TypeKind kind;
-  Type *ptr_to;
+  Type *base;
 };
 
-Function *program();
+Type *int_type();
+Type *pointer_to(Type *base);
 
 //
 // codegen.c
