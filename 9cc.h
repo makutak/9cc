@@ -153,6 +153,7 @@ struct Type {
 
 Type *int_type();
 Type *pointer_to(Type *base);
+void add_type(Function *prog);
 
 //
 // codegen.c
