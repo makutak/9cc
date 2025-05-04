@@ -48,6 +48,7 @@ struct VarList {
 
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
+void error_tok(Token *tok, char *fmt, ...);
 Token *peek(char *op);
 Token *consume(char *op);
 Token *consume_ident();
@@ -98,10 +99,12 @@ typedef struct Node Node;
 struct Node {
   NodeKind kind; // ノードの型
   Node *next;    // 次のノード
-  Node *lhs;     // 左辺
-  Node *rhs;     // 右辺
-  int val;       // kindがNU_NUMの場合のみ使う
-  Var *var;      // kindがND_VARの場合のみ使う
+  Type *type;
+  Token *tok;
+  Node *lhs; // 左辺
+  Node *rhs; // 右辺
+  int val;   // kindがNU_NUMの場合のみ使う
+  Var *var;  // kindがND_VARの場合のみ使う
 
   // "if", while, for  statement
   Node *cond;
