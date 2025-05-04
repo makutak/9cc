@@ -2,6 +2,8 @@
 
 cat <<EOF | gcc -xc -c -o tmp2.o -
 #include <stdio.h>
+#include <stdlib.h>
+
 int print3() { printf("3\n"); return 3; }
 int print5() { printf("5\n"); return 5; }
 int print_args(int a) { printf("a: %d\n", a); return a;}
@@ -20,6 +22,16 @@ int sum(int i, int j) {
   }
   return sum;
 }
+
+
+void alloc4(int **p, int a, int b, int c, int d) {
+  *p = malloc(sizeof(long) * 4);
+  ((long *)(*p))[0] = a;
+  ((long *)(*p))[1] = b;
+  ((long *)(*p))[2] = c;
+  ((long *)(*p))[3] = d;
+}
+
 EOF
 
 assert() {
@@ -120,5 +132,7 @@ assert 5 'int main() { int x=3; int *y=&x; *y=5; return x; }'
 assert 7 'int main() { int x=3; int y=5; *(&x+1)=7; return y; }'
 assert 7 'int main() { int x=3; int y=5; *(&y-1)=7; return x; }'
 assert 8 'int main() { int x=3; int y=5; return foo(&x, y); } int foo(int *x, int y) { return *x + y; }'
+
+assert 8 'int main() { int *p; alloc4(&p, 1, 2, 4, 8); int *q; q = p + 2; *q; q = p + 3; return *q; }'
 
 echo OK
