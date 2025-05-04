@@ -35,7 +35,7 @@ typedef struct Var Var;
 struct Var {
   char *name; // 変数の名前
   int offset; // RPBからのオフセット
-  Type *ty;
+  Type *type;
 };
 
 typedef struct VarList VarList;

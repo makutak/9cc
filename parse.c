@@ -13,10 +13,10 @@ Var *push_var(char *name) {
   return var;
 }
 
-Var *create_var(char *name, Type *ty) {
+Var *create_var(char *name, Type *type) {
   Var *var = calloc(1, sizeof(Var));
   var->name = name;
-  var->ty = ty;
+  var->type = type;
   return var;
 }
 

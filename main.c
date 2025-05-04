@@ -10,6 +10,8 @@ int main(int argc, char **argv) {
   user_input = argv[1];
   token = tokenize();
   Function *prog = program();
+  add_type(prog);
+
   for (Function *fn = prog; fn; fn = fn->next) {
     int offset = 0;
     for (VarList *lvar = fn->locals; lvar; lvar = lvar->next) {
