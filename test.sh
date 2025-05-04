@@ -116,10 +116,8 @@ assert 7 'int main() { return add2(3,4); } int add2(int x,int y) { return x+y; }
 assert 1 'int main() { return sub2(4,3); } int sub2(int x,int y) { return x-y; }'
 assert 55 'int main() { return fib(9); } int fib(int x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }'
 
-# assert 3 'int main() { int x; int y; x = 3; y = &x; return *y; }'
-# assert 3 'int main() { int x; x = 3; return *&x; }'
-# assert 3 'int main() { int x; int y; x = 3; y = &x; return *y; }'
-# assert 3 'int main() { int x; int y; x = 3; y = 5; return *(&y-8); }'
+assert 3 'int main() { int x; x = 3; return *&x; }'
+assert 3 'int main() { int x=3; int *p=&x; return *p; }'
 
 assert 3 'int main() { int x=3; return *&x; }'
 assert 3 'int main() { int x=3; int *y=&x; int **z=&y; return **z; }'
