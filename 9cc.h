@@ -157,6 +157,7 @@ struct Type {
 Type *int_type();
 Type *pointer_to(Type *base);
 void add_type(Function *prog);
+int size_of(Type *type);
 
 //
 // codegen.c

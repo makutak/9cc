@@ -13,6 +13,13 @@ Type *pointer_to(Type *base) {
   return type;
 }
 
+int size_of(Type *type) {
+  if (type->kind == TY_INT)
+    return 4;
+  else
+    return 8;
+}
+
 void visit(Node *node) {
   if (!node)
     return;

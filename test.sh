@@ -25,11 +25,11 @@ int sum(int i, int j) {
 
 
 void alloc4(int **p, int a, int b, int c, int d) {
-  *p = malloc(sizeof(long) * 4);
-  ((long *)(*p))[0] = a;
-  ((long *)(*p))[1] = b;
-  ((long *)(*p))[2] = c;
-  ((long *)(*p))[3] = d;
+  *p = malloc(sizeof(int) * 4);
+  (*p)[0] = a;
+  (*p)[1] = b;
+  (*p)[2] = c;
+  (*p)[3] = d;
 }
 
 EOF

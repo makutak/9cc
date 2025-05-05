@@ -15,11 +15,12 @@ int main(int argc, char **argv) {
   for (Function *fn = prog; fn; fn = fn->next) {
     int offset = 0;
     for (VarList *lvar = fn->locals; lvar; lvar = lvar->next) {
-      offset += 8;
-      lvar->var->offset = offset;
+      Var *var = lvar->var;
+      offset += size_of(var->type);
       /* printf("locals->var->offset: %d %p\n", lvar->var->offset, &lvar->var->offset); */
       /* printf("locals->var->name: %s\n", lvar->var->name); */
       /* printf("\n"); */
+      var->offset = offset;
     }
     fn->stack_size = offset;
 

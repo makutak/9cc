@@ -1,13 +1,13 @@
 #include "9cc.h"
 
 int labelseq = 0;
-static char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+static char *argreg4[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
+static char *argreg8[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 void gen_lval(Node *node) {
   switch (node->kind) {
   case ND_VAR:
-    printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", node->var->offset);
+    printf("  lea rax, [rbp-%d]\n", node->var->offset);
     printf("  push rax\n");
     return;
   case ND_DEREF:
@@ -35,7 +35,10 @@ void gen(Node *node) {
   case ND_VAR:
     gen_lval(node);
     printf("  pop rax\n");
-    printf("  mov rax, [rax]\n");
+    if (node->type->kind == TY_INT)
+      printf("  movsxd rax, DWORD PTR [rax]\n");
+    else
+      printf("  mov rax, [rax]\n");
     printf("  push rax\n");
     return;
   case ND_ASSIGN:
@@ -43,7 +46,10 @@ void gen(Node *node) {
     gen(node->rhs);
     printf("  pop rdi\n");
     printf("  pop rax\n");
-    printf("  mov [rax], rdi\n");
+    if (node->type->kind == TY_INT)
+      printf("  mov [rax], edi\n");
+    else
+      printf("  mov [rax], rdi\n");
     printf("  push rdi\n");
     return;
   case ND_IF:
@@ -101,7 +107,7 @@ void gen(Node *node) {
     }
 
     for (int i = arg_count - 1; i >= 0; i--)
-      printf("  pop %s\n", argreg[i]);
+      printf("  pop %s\n", argreg8[i]);
 
     int seq = labelseq++;
     printf("  mov rax, rsp\n");
@@ -138,12 +144,12 @@ void gen(Node *node) {
   switch (node->kind) {
   case ND_ADD:
     if (node->type->kind == TY_PTR)
-      printf("  imul rdi, 8\n");
+      printf("  imul rdi, %d\n", size_of(node->type->base));
     printf("  add rax, rdi\n");
     break;
   case ND_SUB:
     if (node->type->kind == TY_PTR)
-      printf("  imul rdi, 8\n");
+      printf("  imul rdi, %d\n", size_of(node->type->base));
     printf("  sub rax, rdi\n");
     break;
   case ND_MUL:
@@ -195,7 +201,10 @@ void codegen(Function *prog) {
     int i = 0;
     for (VarList *vl = fn->params; vl; vl = vl->next) {
       Var *var = vl->var;
-      printf("  mov [rbp-%d], %s\n", vl->var->offset, argreg[i++]);
+      if (var->type->kind == TY_INT)
+        printf("  mov DWORD PTR [rbp-%d], %s\n", vl->var->offset, argreg4[i++]);
+      else
+        printf("  mov QWORD PTR [rbp-%d], %s\n", vl->var->offset, argreg8[i++]);
     }
 
     // 先頭の式から順にコード生成
