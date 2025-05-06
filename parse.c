@@ -356,10 +356,9 @@ Node *mul() {
   }
 }
 
-// unary = "+"? primary
-//       | "-"? primary
-//       | "*" unary
-//       | "&" unary
+// unary = ("+" | "-" | "*" | "&") unary
+//       | "sizeof" unary
+//       | primary
 Node *unary() {
   Token *tok;
 
@@ -374,6 +373,9 @@ Node *unary() {
 
   if (tok = consume("*"))
     return new_unary_node(ND_DEREF, unary(), tok);
+
+  if (tok = consume("sizeof"))
+    return new_unary_node(ND_SIZEOF, unary(), tok);
 
   return primary();
 }

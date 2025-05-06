@@ -77,6 +77,12 @@ void visit(Node *node) {
       error_tok(node->tok, "無効なポインタ参照です");
     node->type = node->lhs->type->base;
     return;
+  case ND_SIZEOF:
+    node->kind = ND_NUM;
+    node->type = int_type();
+    node->val = size_of(node->lhs->type);
+    node->lhs = NULL;
+    return;
   }
 }
 

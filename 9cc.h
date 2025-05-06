@@ -87,6 +87,7 @@ typedef enum {
   ND_IF,      // if
   ND_WHILE,   // while
   ND_FOR,     // for
+  ND_SIZEOF,  // sizeof
   ND_BLOCK,   // block {}
   ND_FUNCALL, // Function call
   ND_ADDR,    // unary &
