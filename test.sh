@@ -149,4 +149,11 @@ assert 4 'int main() { int *y; return sizeof *y; }'
 assert 4 'int main() { return sizeof 1; }'
 assert 4 'int main() { return sizeof sizeof 1; }' #本来はsize_tなので8になる
 
+assert 3 'int main() { int x[2]; int *y=&x; *y=3; return *x; }'
+
+assert 3 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *x; }'
+assert 4 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *(x+1); }'
+assert 5 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *(x+2); }'
+
+
 echo OK

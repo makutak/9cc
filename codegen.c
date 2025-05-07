@@ -15,7 +15,7 @@ void gen_lval(Node *node) {
     gen(node->lhs);
     return;
   }
-  error("代入の左辺値が変数ではありません");
+  error_tok(node->tok, "代入の左辺値が変数ではありません");
 }
 
 void gen(Node *node) {
@@ -33,12 +33,14 @@ void gen(Node *node) {
     return;
   case ND_VAR:
     gen_lval(node);
-    printf("  pop rax\n");
-    if (node->type->kind == TY_INT)
-      printf("  movsxd rax, DWORD PTR [rax]\n");
-    else
-      printf("  mov rax, [rax]\n");
-    printf("  push rax\n");
+    if (node->type->kind != TY_ARRAY) {
+      printf("  pop rax\n");
+      if (node->type->kind == TY_INT)
+        printf("  movsxd rax, DWORD PTR [rax]\n");
+      else
+        printf("  mov rax, [rax]\n");
+      printf("  push rax\n");
+    }
     return;
   case ND_ASSIGN:
     gen_lval(node->lhs);
@@ -128,9 +130,11 @@ void gen(Node *node) {
     return;
   case ND_DEREF:
     gen(node->lhs);
-    printf("  pop rax\n");
-    printf("  mov rax, [rax]\n");
-    printf("  push rax\n");
+    if (node->type->kind != TY_ARRAY) {
+      printf("  pop rax\n");
+      printf("  mov rax, [rax]\n");
+      printf("  push rax\n");
+    }
     return;
   }
 
@@ -142,12 +146,12 @@ void gen(Node *node) {
 
   switch (node->kind) {
   case ND_ADD:
-    if (node->type->kind == TY_PTR)
+    if (node->type->base)
       printf("  imul rdi, %d\n", size_of(node->type->base));
     printf("  add rax, rdi\n");
     break;
   case ND_SUB:
-    if (node->type->kind == TY_PTR)
+    if (node->type->base)
       printf("  imul rdi, %d\n", size_of(node->type->base));
     printf("  sub rax, rdi\n");
     break;

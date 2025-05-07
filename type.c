@@ -13,11 +13,24 @@ Type *pointer_to(Type *base) {
   return type;
 }
 
+Type *array_type(Type *base, int size) {
+  Type *type = calloc(1, sizeof(Type));
+  type->kind = TY_ARRAY;
+  type->base = base;
+  type->array_size = size;
+  return type;
+}
+
 int size_of(Type *type) {
-  if (type->kind == TY_INT)
+  switch (type->kind) {
+  case TY_INT:
     return 4;
-  else
+  case TY_PTR:
     return 8;
+  case TY_ARRAY:
+    return size_of(type->base) * type->array_size;
+  }
+  error("不明な型です");
 }
 
 void visit(Node *node) {
@@ -52,17 +65,17 @@ void visit(Node *node) {
     node->type = node->var->type;
     return;
   case ND_ADD:
-    if (node->rhs->type->kind == TY_PTR) {
+    if (node->rhs->type->base) {
       Node *tmp = node->lhs;
       node->lhs = node->rhs;
       node->rhs = tmp;
     }
-    if (node->rhs->type->kind == TY_PTR)
+    if (node->rhs->type->base)
       error_tok(node->tok, "無効なポインタ演算オペランドです");
     node->type = node->lhs->type;
     return;
   case ND_SUB:
-    if (node->rhs->type->kind == TY_PTR)
+    if (node->rhs->type->base)
       error_tok(node->tok, "無効なポインタ演算オペランドです");
     node->type = node->lhs->type;
     return;
@@ -70,10 +83,13 @@ void visit(Node *node) {
     node->type = node->lhs->type;
     return;
   case ND_ADDR:
-    node->type = pointer_to(node->lhs->type);
+    if (node->lhs->type->kind == TY_ARRAY)
+      node->type = pointer_to(node->lhs->type->base);
+    else
+      node->type = pointer_to(node->lhs->type);
     return;
   case ND_DEREF:
-    if (node->lhs->type->kind != TY_PTR)
+    if (!node->lhs->type->base)
       error_tok(node->tok, "無効なポインタ参照です");
     node->type = node->lhs->type->base;
     return;

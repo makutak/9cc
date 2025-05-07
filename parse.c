@@ -177,8 +177,16 @@ Node *declaration() {
 
   // 新しい変数宣言
   Type *type = basetype();
-  Var *var = create_var(expect_ident(), type);
+  char *name = expect_ident();
+
+  if (consume("[")) {
+    int size = expect_number();
+    type = array_type(type, size);
+    expect("]");
+  }
+  Var *var = create_var(name, type);
   register_local(var);
+
   if (consume(";"))
     return new_var_node(var, tok);
 
