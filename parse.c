@@ -171,7 +171,16 @@ VarList *read_params() {
   return head.next;
 }
 
-// declaration = basetype ident ("=" expr) ";"
+Type *read_type_suffix(Type *base) {
+  if (!consume("["))
+    return base;
+
+  int size = expect_number();
+  expect("]");
+  base = read_type_suffix(base);
+  return array_type(base, size);
+}
+// declaration = basetype ident ("[" num "]")* ("=" expr) ";"
 Node *declaration() {
   Token *tok = token;
 
@@ -179,11 +188,7 @@ Node *declaration() {
   Type *type = basetype();
   char *name = expect_ident();
 
-  if (consume("[")) {
-    int size = expect_number();
-    type = array_type(type, size);
-    expect("]");
-  }
+  type = read_type_suffix(type);
   Var *var = create_var(name, type);
   register_local(var);
 
