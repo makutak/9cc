@@ -148,15 +148,21 @@ Function *program();
 // type.c
 //
 
-typedef enum { TY_INT, TY_PTR } TypeKind;
+typedef enum {
+  TY_INT,
+  TY_PTR,
+  TY_ARRAY,
+} TypeKind;
 
 struct Type {
   TypeKind kind;
   Type *base;
+  size_t array_size;
 };
 
 Type *int_type();
 Type *pointer_to(Type *base);
+Type *array_type(Type *base, int size);
 void add_type(Function *prog);
 int size_of(Type *type);
 
