@@ -369,7 +369,7 @@ Node *mul() {
   }
 }
 
-// unary = ("+" | "-" | "*" | "&") unary
+// unary = ("+" | "-" | "*" | "&")? unary
 //       | "sizeof" unary
 //       | primary
 Node *unary() {
