@@ -89,6 +89,7 @@ Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
+Node *postfix();
 Node *primary();
 
 // program = function*
@@ -371,7 +372,7 @@ Node *mul() {
 
 // unary = ("+" | "-" | "*" | "&")? unary
 //       | "sizeof" unary
-//       | primary
+//       | postfix
 Node *unary() {
   Token *tok;
 
@@ -390,7 +391,21 @@ Node *unary() {
   if (tok = consume("sizeof"))
     return new_unary_node(ND_SIZEOF, unary(), tok);
 
-  return primary();
+  return postfix();
+}
+
+// postfix = primary ("[" expr "]")*
+Node *postfix() {
+  Node *node = primary();
+  Token *tok;
+
+  while (tok = consume("[")) {
+    Node *exp = new_binary_node(ND_ADD, node, expr(), tok);
+    expect("]");
+    node = new_unary_node(ND_DEREF, exp, tok);
+  }
+
+  return node;
 }
 
 // func_args = "(" (expr ("," expr)*)? ")"
