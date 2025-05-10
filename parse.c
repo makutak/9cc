@@ -181,6 +181,7 @@ Type *read_type_suffix(Type *base) {
   base = read_type_suffix(base);
   return array_type(base, size);
 }
+
 // declaration = basetype ident ("[" num "]")* ("=" expr) ";"
 Node *declaration() {
   Token *tok = token;
