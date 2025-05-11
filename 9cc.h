@@ -33,9 +33,12 @@ struct Token {
 typedef struct Var Var;
 // 変数の型
 struct Var {
-  char *name; // 変数の名前
+  char *name;    // 変数の名前
+  Type *type;    // 型
+  bool is_local; // local or global
+
+  // Local変数
   int offset; // RPBからのオフセット
-  Type *type;
 };
 
 typedef struct VarList VarList;
