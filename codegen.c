@@ -187,11 +187,11 @@ void gen(Node *node) {
   printf("  push rax\n");
 }
 
-void codegen(Function *prog) {
+void codegen(Program *prog) {
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");
 
-  for (Function *fn = prog; fn; fn = fn->next) {
+  for (Function *fn = prog->fns; fn; fn = fn->next) {
     printf(".global %s\n", fn->name);
     printf("%s:\n", fn->name);
     funcname = fn->name;

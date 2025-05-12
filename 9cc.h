@@ -145,7 +145,12 @@ struct Function {
   int stack_size;
 };
 
-Function *program();
+typedef struct {
+  VarList *globals;
+  Function *fns;
+} Program;
+
+Program *program();
 
 //
 // type.c
@@ -166,12 +171,12 @@ struct Type {
 Type *int_type();
 Type *pointer_to(Type *base);
 Type *array_type(Type *base, int size);
-void add_type(Function *prog);
+void add_type(Program *prog);
 int size_of(Type *type);
 
 //
 // codegen.c
 //
 void gen(Node *node);
-void codegen(Function *prog);
+void codegen(Program *prog);
 void print_ast(Node *node, int depth);

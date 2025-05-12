@@ -77,7 +77,7 @@ Var *find_var(Token *tok) {
   return NULL;
 }
 
-Function *program();
+Program *program();
 Function *function();
 VarList *read_params();
 Node *declaration();
@@ -93,17 +93,20 @@ Node *postfix();
 Node *primary();
 
 // program = function*
-Function *program() {
+Program *program() {
   Function head = {};
   head.next = NULL;
   Function *cur = &head;
+
   while (!at_eof()) {
     cur->next = function();
     cur = cur->next;
   }
   cur->next = NULL;
 
-  return head.next;
+  Program *prog = calloc(1, sizeof(Program));
+  prog->fns = head.next;
+  return prog;
 }
 
 // basetype = "int" "*"*
