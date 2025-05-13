@@ -1,6 +1,7 @@
 #include "9cc.h"
 
 VarList *locals;
+VarList *globals;
 
 Var *push_var(char *name) {
   Var *var = calloc(1, sizeof(Var));
@@ -13,10 +14,11 @@ Var *push_var(char *name) {
   return var;
 }
 
-Var *create_var(char *name, Type *type) {
+Var *create_var(char *name, Type *type, bool is_local) {
   Var *var = calloc(1, sizeof(Var));
   var->name = name;
   var->type = type;
+  var->is_local = is_local;
   return var;
 }
 
@@ -25,6 +27,13 @@ void register_local(Var *var) {
   vl->var = var;
   vl->next = locals;
   locals = vl;
+}
+
+void register_globals(Var *var) {
+  VarList *vl = calloc(1, sizeof(VarList));
+  vl->var = var;
+  vl->next = globals;
+  globals = vl;
 }
 
 Node *new_node(NodeKind kind, Token *tok) {
@@ -66,9 +75,15 @@ Node *new_funcall_node(char *funcname, Node *args, Token *tok) {
   return node;
 }
 
-// ローカル変数を名前で検索する。見つからなかった場合はNULLを返す
+// ローカル変数かグローバル変数を名前で検索する。見つからなかった場合はNULLを返す
 Var *find_var(Token *tok) {
   for (VarList *vl = locals; vl; vl = vl->next) {
+    Var *var = vl->var;
+    if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
+      return var;
+  }
+
+  for (VarList *vl = globals; vl; vl = vl->next) {
     Var *var = vl->var;
     if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
       return var;
@@ -160,7 +175,7 @@ VarList *read_params() {
     Type *type = basetype();
 
     cur->next = calloc(1, sizeof(VarList));
-    Var *var = create_var(expect_ident(), type);
+    Var *var = create_var(expect_ident(), type, true);
     cur->next->var = var;
     register_local(var);
     cur = cur->next;
@@ -194,7 +209,7 @@ Node *declaration() {
   char *name = expect_ident();
 
   type = read_type_suffix(type);
-  Var *var = create_var(name, type);
+  Var *var = create_var(name, type, true);
   register_local(var);
 
   if (consume(";"))
