@@ -94,7 +94,8 @@ Var *find_var(Token *tok) {
 
 Program *program();
 Function *function();
-VarList *read_params();
+Type *basetype();
+void global_var();
 Node *declaration();
 Node *stmt();
 Node *expr();
@@ -107,60 +108,12 @@ Node *unary();
 Node *postfix();
 Node *primary();
 
-// program = function*
-Program *program() {
-  Function head = {};
-  head.next = NULL;
-  Function *cur = &head;
-
-  while (!at_eof()) {
-    cur->next = function();
-    cur = cur->next;
-  }
-  cur->next = NULL;
-
-  Program *prog = calloc(1, sizeof(Program));
-  prog->fns = head.next;
-  return prog;
-}
-
-// basetype = "int" "*"*
-Type *basetype() {
-  expect("int");
-  Type *type = int_type();
-  while (consume("*"))
-    type = pointer_to(type);
-
-  return type;
-}
-
-// function = ident "(" params? ")" "{" stmt* "}"
-// params = basetype ident ("," basetype ident)*
-Function *function() {
-  locals = NULL;
-
-  Function *fn = calloc(1, sizeof(Function));
+bool is_function() {
+  Token *tok = token;
   basetype();
-  fn->name = expect_ident();
-  expect("(");
-  fn->params = read_params();
-  expect("{");
-
-  Node head = {};
-  head.next = NULL;
-  Node *cur = &head;
-
-  while (!consume("}")) {
-    cur->next = stmt();
-    cur = cur->next;
-  }
-  cur->next = NULL;
-
-  fn->node = head.next;
-  fn->locals = locals;
-  fn->next = NULL;
-
-  return fn;
+  bool isfunc = consume_ident() && consume("(");
+  token = tok;
+  return isfunc;
 }
 
 VarList *read_params() {
@@ -198,6 +151,78 @@ Type *read_type_suffix(Type *base) {
   expect("]");
   base = read_type_suffix(base);
   return array_type(base, size);
+}
+
+// program = function*
+Program *program() {
+  Function head = {};
+  head.next = NULL;
+  Function *cur = &head;
+  globals = NULL;
+
+  while (!at_eof()) {
+    if (is_function()) {
+      cur->next = function();
+      cur = cur->next;
+    } else {
+      global_var();
+    }
+  }
+  cur->next = NULL;
+
+  Program *prog = calloc(1, sizeof(Program));
+  prog->fns = head.next;
+  prog->globals = globals;
+  return prog;
+}
+
+// basetype = "int" "*"*
+Type *basetype() {
+  expect("int");
+  Type *type = int_type();
+  while (consume("*"))
+    type = pointer_to(type);
+
+  return type;
+}
+
+// global-var = basetype ident ("[" num "]")* ";"
+void global_var() {
+  Type *type = basetype();
+  char *name = expect_ident();
+  type = read_type_suffix(type);
+  expect(";");
+  Var *var = create_var(name, type, false);
+  register_globals(var);
+}
+
+// function = ident "(" params? ")" "{" stmt* "}"
+// params = basetype ident ("," basetype ident)*
+Function *function() {
+  locals = NULL;
+
+  Function *fn = calloc(1, sizeof(Function));
+  basetype();
+  fn->name = expect_ident();
+  expect("(");
+  fn->params = read_params();
+  expect("{");
+
+  Node head = {};
+  head.next = NULL;
+  Node *cur = &head;
+
+  while (!consume("}")) {
+    cur->next = stmt();
+    cur = cur->next;
+  }
+  cur->next = NULL;
+
+  fn->node = head.next;
+  fn->locals = locals;
+  fn->next = NULL;
+
+  return fn;
 }
 
 // declaration = basetype ident ("[" num "]")* ("=" expr) ";"
