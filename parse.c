@@ -153,6 +153,10 @@ Type *read_type_suffix(Type *base) {
   return array_type(base, size);
 }
 
+bool is_typename() {
+  return peek("int") || peek("char");
+}
+
 // program = function*
 Program *program() {
   Function head = {};
@@ -176,10 +180,17 @@ Program *program() {
   return prog;
 }
 
-// basetype = "int" "*"*
+// basetype = ("char" | "int") "*"*
 Type *basetype() {
-  expect("int");
-  Type *type = int_type();
+  Type *type;
+
+  if (consume("char")) {
+    type = char_type();
+  } else {
+    expect("int");
+    type = int_type();
+  }
+
   while (consume("*"))
     type = pointer_to(type);
 
@@ -324,7 +335,7 @@ Node *stmt() {
     return node;
   }
 
-  if (peek("int"))
+  if (is_typename())
     return declaration();
 
   Node *node = expr();

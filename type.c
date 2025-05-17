@@ -1,21 +1,27 @@
 #include "9cc.h"
 
-Type *int_type() {
+Type *new_type(TypeKind kind) {
   Type *type = calloc(1, sizeof(Type));
-  type->kind = TY_INT;
+  type->kind = kind;
   return type;
 }
 
+Type *char_type() {
+  return new_type(TY_CHAR);
+}
+
+Type *int_type() {
+  return new_type(TY_INT);
+}
+
 Type *pointer_to(Type *base) {
-  Type *type = calloc(1, sizeof(Type));
-  type->kind = TY_PTR;
+  Type *type = new_type(TY_PTR);
   type->base = base;
   return type;
 }
 
 Type *array_type(Type *base, int size) {
-  Type *type = calloc(1, sizeof(Type));
-  type->kind = TY_ARRAY;
+  Type *type = new_type(TY_ARRAY);
   type->base = base;
   type->array_size = size;
   return type;
@@ -23,6 +29,8 @@ Type *array_type(Type *base, int size) {
 
 int size_of(Type *type) {
   switch (type->kind) {
+  case TY_CHAR:
+    return 1;
   case TY_INT:
     return 4;
   case TY_PTR:
