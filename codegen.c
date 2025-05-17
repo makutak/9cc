@@ -25,6 +25,30 @@ void gen_lval(Node *node) {
   error_tok(node->tok, "代入の左辺値が変数ではありません");
 }
 
+void store(Type *type) {
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
+  if (type->kind == TY_CHAR)
+    printf("  mov [rax], dil\n");
+  else if (type->kind == TY_INT)
+    printf("  mov [rax], edi\n");
+  else
+    printf("  mov [rax], rdi\n");
+  // 結果をスタックに残すため
+  printf("  push rdi\n");
+}
+
+void load(Type *type) {
+  printf("  pop rax\n");
+  if (type->kind == TY_CHAR)
+    printf("  movzx rax, BYTE PTR [rax]\n");
+  else if (type->kind == TY_INT)
+    printf("  movsxd rax, DWORD PTR [rax]\n");
+  else
+    printf("  mov rax, [rax]\n");
+  printf("  push rax\n");
+}
+
 void gen(Node *node) {
   if (node->kind == ND_RETURN) {
     gen(node->lhs);
@@ -40,29 +64,14 @@ void gen(Node *node) {
     return;
   case ND_VAR:
     gen_lval(node);
-    if (node->type->kind != TY_ARRAY) {
-      printf("  pop rax\n");
-      if (node->type->kind == TY_CHAR)
-        printf("  movzx rax, BYTE PTR [rax]\n");
-      else if (node->type->kind == TY_INT)
-        printf("  movsxd rax, DWORD PTR [rax]\n");
-      else
-        printf("  mov rax, [rax]\n");
-      printf("  push rax\n");
-    }
+    if (node->type->kind != TY_ARRAY)
+      load(node->type);
+
     return;
   case ND_ASSIGN:
     gen_lval(node->lhs);
     gen(node->rhs);
-    printf("  pop rdi\n");
-    printf("  pop rax\n");
-    if (node->type->kind == TY_CHAR)
-      printf("  mov [rax], dil\n");
-    else if (node->type->kind == TY_INT)
-      printf("  mov [rax], edi\n");
-    else
-      printf("  mov [rax], rdi\n");
-    printf("  push rdi\n");
+    store(node->type);
     return;
   case ND_IF:
     gen(node->cond);
@@ -141,11 +150,9 @@ void gen(Node *node) {
     return;
   case ND_DEREF:
     gen(node->lhs);
-    if (node->type->kind != TY_ARRAY) {
-      printf("  pop rax\n");
-      printf("  mov rax, [rax]\n");
-      printf("  push rax\n");
-    }
+    if (node->type->kind != TY_ARRAY)
+      load(node->type);
+
     return;
   }
 
