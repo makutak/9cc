@@ -2,6 +2,7 @@
 
 int labelseq = 0;
 char *funcname;
+static char *argreg1[] = {"dil", "sil", "dl", "cl", "r8b", "r9b"};
 static char *argreg4[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 static char *argreg8[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
@@ -41,7 +42,9 @@ void gen(Node *node) {
     gen_lval(node);
     if (node->type->kind != TY_ARRAY) {
       printf("  pop rax\n");
-      if (node->type->kind == TY_INT)
+      if (node->type->kind == TY_CHAR)
+        printf("  movzx rax, BYTE PTR [rax]\n");
+      else if (node->type->kind == TY_INT)
         printf("  movsxd rax, DWORD PTR [rax]\n");
       else
         printf("  mov rax, [rax]\n");
@@ -53,7 +56,9 @@ void gen(Node *node) {
     gen(node->rhs);
     printf("  pop rdi\n");
     printf("  pop rax\n");
-    if (node->type->kind == TY_INT)
+    if (node->type->kind == TY_CHAR)
+      printf("  mov [rax], dil\n");
+    else if (node->type->kind == TY_INT)
       printf("  mov [rax], edi\n");
     else
       printf("  mov [rax], rdi\n");
@@ -219,7 +224,9 @@ void emit_text(Program *prog) {
     int i = 0;
     for (VarList *vl = fn->params; vl; vl = vl->next) {
       Var *var = vl->var;
-      if (var->type->kind == TY_INT)
+      if (var->type->kind == TY_CHAR)
+        printf("  mov BYTE PTR [rbp-%d], %s\n", vl->var->offset, argreg1[i++]);
+      else if (var->type->kind == TY_INT)
         printf("  mov DWORD PTR [rbp-%d], %s\n", vl->var->offset, argreg4[i++]);
       else
         printf("  mov QWORD PTR [rbp-%d], %s\n", vl->var->offset, argreg8[i++]);
