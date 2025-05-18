@@ -203,6 +203,11 @@ Token *tokenize() {
       continue;
     }
 
+    if (strchr("+-*/()<>=;{},&[]", *p)) {
+      cur = new_token(TK_RESERVED, cur, p++, 1);
+      continue;
+    }
+
     if (is_alpha(*p)) {
       char *q = p;
       while (is_alnum(*p))
@@ -211,8 +216,17 @@ Token *tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<>=;{},&[]", *p)) {
-      cur = new_token(TK_RESERVED, cur, p++, 1);
+    if (*p == '"') {
+      char *q = p++;
+      while (*p && *p != '"')
+        p++;
+      if (!*p)
+        error_at(q, "文字列リテラルが閉じられていません");
+      p++;
+
+      cur = new_token(TK_STR, cur, q, p - q);
+      cur->contents = strndup(q + 1, p - q - 2);
+      cur->cont_len = p - q - 1;
       continue;
     }
 

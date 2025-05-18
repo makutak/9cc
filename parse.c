@@ -92,6 +92,13 @@ Var *find_var(Token *tok) {
   return NULL;
 }
 
+char *new_label() {
+  static int cnt = 0;
+  char buf[20];
+  sprintf(buf, ".L.data.%d", cnt++);
+  return strndup(buf, 20);
+}
+
 Program *program();
 Function *function();
 Type *basetype();
@@ -512,6 +519,17 @@ Node *primary() {
   }
 
   tok = token;
+  if (tok->kind == TK_STR) {
+    token = token->next;
+
+    Type *type = array_type(char_type(), tok->cont_len);
+    Var *var = create_var(new_label(), type, false);
+    register_globals(var);
+    var->contents = tok->contents;
+    var->cont_len = tok->cont_len;
+    return new_var_node(var, tok);
+  }
+
   if (tok->kind != TK_NUM)
     error_tok(tok, "数値ではありません");
   // それ以外は数値リテラル
