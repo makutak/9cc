@@ -164,7 +164,7 @@ bool is_typename() {
   return peek("int") || peek("char");
 }
 
-// program = function*
+// program = (global-var | function)*
 Program *program() {
   Function head = {};
   head.next = NULL;
@@ -493,9 +493,10 @@ Node *func_args() {
   return head.next;
 }
 
-// primary = num
+// primary = "(" expr ")"
 //         | ident func_args?
-//         | "(" expr ")"
+//         | str
+//         | num
 Node *primary() {
   // 次のトークンが"("なら、"(" expr ")" のはず
   if (consume("(")) {
