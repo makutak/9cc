@@ -217,15 +217,20 @@ Token *tokenize() {
     }
 
     if (*p == '"') {
-      char *q = p++;
+      char *q = p++; // "の開始をqにセットし、pをインクリメント
       while (*p && *p != '"')
         p++;
       if (!*p)
         error_at(q, "文字列リテラルが閉じられていません");
-      p++;
+      p++; // "の終了位置をスキップ
 
       cur = new_token(TK_STR, cur, q, p - q);
+
+      // q + 1 => 開きクォートの次の文字
+      // p - q - 2 => 開きクォートと閉じクォートを除外した文字列の長さ(\0含む)
       cur->contents = strndup(q + 1, p - q - 2);
+
+      // 閉じクォートを除外した文字列の長さ(\0含まない)
       cur->cont_len = p - q - 1;
       continue;
     }
