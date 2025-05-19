@@ -2,6 +2,7 @@
 
 int labelseq = 0;
 char *funcname;
+
 static char *argreg1[] = {"dil", "sil", "dl", "cl", "r8b", "r9b"};
 static char *argreg4[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 static char *argreg8[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
@@ -211,7 +212,14 @@ void emit_data(Program *prog) {
   for (VarList *vl = prog->globals; vl; vl = vl->next) {
     Var *var = vl->var;
     printf("%s:\n", var->name);
-    printf("  .zero %d\n", size_of(var->type));
+
+    if (!var->contents) {
+      printf("  .zero %d\n", size_of(var->type));
+      continue;
+    }
+
+    for (int i = 0; i < var->cont_len; i++)
+      printf("  .byte %d\n", var->contents[i]);
   }
 }
 
