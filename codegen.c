@@ -29,9 +29,9 @@ void gen_lval(Node *node) {
 void store(Type *type) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
-  if (type->kind == TY_CHAR)
+  if (size_of(type) == 1)
     printf("  mov [rax], dil\n");
-  else if (type->kind == TY_INT)
+  else if (size_of(type) == 4)
     printf("  mov [rax], edi\n");
   else
     printf("  mov [rax], rdi\n");
@@ -41,9 +41,9 @@ void store(Type *type) {
 
 void load(Type *type) {
   printf("  pop rax\n");
-  if (type->kind == TY_CHAR)
+  if (size_of(type) == 1)
     printf("  movzx rax, BYTE PTR [rax]\n");
-  else if (type->kind == TY_INT)
+  else if (size_of(type) == 4)
     printf("  movsxd rax, DWORD PTR [rax]\n");
   else
     printf("  mov rax, [rax]\n");
@@ -239,9 +239,9 @@ void emit_text(Program *prog) {
     int i = 0;
     for (VarList *vl = fn->params; vl; vl = vl->next) {
       Var *var = vl->var;
-      if (var->type->kind == TY_CHAR)
+      if (size_of(var->type) == 1)
         printf("  mov BYTE PTR [rbp-%d], %s\n", vl->var->offset, argreg1[i++]);
-      else if (var->type->kind == TY_INT)
+      else if (size_of(var->type) == 4)
         printf("  mov DWORD PTR [rbp-%d], %s\n", vl->var->offset, argreg4[i++]);
       else
         printf("  mov QWORD PTR [rbp-%d], %s\n", vl->var->offset, argreg8[i++]);
