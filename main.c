@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
     error("%s: 引数の個数が正しくありません", argv[0]);
 
   // トークナイズしてパースする
+  // user_input = argv[1];
   user_input = read_file(argv[1]);
   token = tokenize();
   Program *prog = program();
