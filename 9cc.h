@@ -72,6 +72,9 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 Token *tokenize();
 char *strndup(char *p, int len);
 
+// 入力ファイル名
+extern char *filename;
+
 // 入力プログラム
 extern char *user_input;
 
