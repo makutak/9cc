@@ -1,19 +1,21 @@
 CFLAGS=-std=c11 -g -static
-SRCS=$(wildcard *.c)
-OBJS=$(SRCS:.c=.o)
+SRCDIR=src
+TESTDIR=test
+SRCS=$(wildcard $(SRCDIR)/*.c)
+OBJS=$(SRCS:$(SRCDIR)/%.c=$(SRCDIR)/%.o)
 CTAGS := /usr/bin/ctags
 CSCOPE := /usr/bin/cscope
 
 9cc: $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
-$(OBJS): 9cc.h
+$(OBJS): $(SRCDIR)/9cc.h
 
 test: 9cc
-	./test.sh
+	./$(TESTDIR)/test.sh
 
 clean:
-	rm -f 9cc *.o *~ tmp*
+	rm -f 9cc $(SRCDIR)/*.o *~ tmp*
 
 tags:
 	$(CTAGS) -e -R .
