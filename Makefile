@@ -12,7 +12,9 @@ CSCOPE := /usr/bin/cscope
 $(OBJS): $(SRCDIR)/9cc.h
 
 test: 9cc
-	./$(TESTDIR)/test.sh
+	./9cc ./test/test.c > tmp.s
+	gcc -static -o tmp tmp.s
+	./tmp
 
 clean:
 	rm -f 9cc $(SRCDIR)/*.o *~ tmp*
