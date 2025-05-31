@@ -16,6 +16,9 @@ test: 9cc
 	gcc -static -o tmp tmp.s
 	./tmp
 
+test-sh: 9cc
+	./$(TESTDIR)/test.sh
+
 clean:
 	rm -f 9cc $(SRCDIR)/*.o *~ tmp*
 
