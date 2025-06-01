@@ -87,26 +87,29 @@ extern Token *token;
 
 // 抽象構文木のノードの種類
 typedef enum {
-  ND_ADD,     // +
-  ND_SUB,     // -
-  ND_MUL,     // *
-  ND_DIV,     // /
-  ND_EQ,      // ==
-  ND_NE,      // !=
-  ND_LT,      // <
-  ND_LE,      // <=
-  ND_ASSIGN,  // =
-  ND_VAR,     // 変数
-  ND_NUM,     // 整数
-  ND_RETURN,  // return
-  ND_IF,      // if
-  ND_WHILE,   // while
-  ND_FOR,     // for
-  ND_SIZEOF,  // sizeof
-  ND_BLOCK,   // block {}
-  ND_FUNCALL, // Function call
-  ND_ADDR,    // unary &
-  ND_DEREF    // unary *
+  ND_ADD,       // +
+  ND_SUB,       // -
+  ND_MUL,       // *
+  ND_DIV,       // /
+  ND_EQ,        // ==
+  ND_NE,        // !=
+  ND_LT,        // <
+  ND_LE,        // <=
+  ND_ASSIGN,    // =
+  ND_VAR,       // 変数
+  ND_NUM,       // 整数
+  ND_RETURN,    // return
+  ND_IF,        // if
+  ND_WHILE,     // while
+  ND_FOR,       // for
+  ND_SIZEOF,    // sizeof
+  ND_BLOCK,     // block {}
+  ND_FUNCALL,   // Function call
+  ND_ADDR,      // unary &
+  ND_DEREF,     // unary *
+  ND_EXPR_STMT, // Expression statement
+  ND_STMT_EXPR, // Statement expression
+  ND_NULL,      // Empty statement
 } NodeKind;
 
 typedef struct Node Node;
@@ -128,7 +131,7 @@ struct Node {
   Node *els;
   Node *init;
   Node *inc;
-  // block {}
+  // {} block or statement expression
   Node *block;
 
   // function name

@@ -26,23 +26,10 @@ void gen_lval(Node *node) {
   error_tok(node->tok, "代入の左辺値が変数ではありません");
 }
 
-void store(Type *type) {
-  printf("  pop rdi\n");
-  printf("  pop rax\n");
-  if (size_of(type) == 1)
-    printf("  mov [rax], dil\n");
-  else if (size_of(type) == 4)
-    printf("  mov [rax], edi\n");
-  else
-    printf("  mov [rax], rdi\n");
-  // 結果をスタックに残すため
-  printf("  push rdi\n");
-}
-
 void load(Type *type) {
   printf("  pop rax\n");
   if (size_of(type) == 1)
-    printf("  movzx rax, BYTE PTR [rax]\n");
+    printf("  movsx rax, BYTE PTR [rax]\n");
   else if (size_of(type) == 4)
     printf("  movsxd rax, DWORD PTR [rax]\n");
   else
@@ -50,31 +37,44 @@ void load(Type *type) {
   printf("  push rax\n");
 }
 
-void gen(Node *node) {
-  if (node->kind == ND_RETURN) {
-    gen(node->lhs);
-    printf("  pop rax\n");
-    printf("  jmp .Lreturn.%s\n", funcname);
-    return;
-  }
+void store(Type *type) {
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
 
-  int seq = labelseq++;
+  if (size_of(type) == 1)
+    printf("  mov [rax], dil\n");
+  else if (size_of(type) == 4)
+    printf("  mov [rax], edi\n");
+  else
+    printf("  mov [rax], rdi\n");
+
+  // 結果をスタックに残すため
+  printf("  push rdi\n");
+}
+
+void gen(Node *node) {
   switch (node->kind) {
+  case ND_NULL:
+    return;
   case ND_NUM:
     printf("  push %d\n", node->val);
+    return;
+  case ND_EXPR_STMT:
+    gen(node->lhs);
+    printf("  add rsp, 8\n");
     return;
   case ND_VAR:
     gen_lval(node);
     if (node->type->kind != TY_ARRAY)
       load(node->type);
-
     return;
   case ND_ASSIGN:
     gen_lval(node->lhs);
     gen(node->rhs);
     store(node->type);
     return;
-  case ND_IF:
+  case ND_IF: {
+    int seq = labelseq++;
     gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
@@ -86,7 +86,9 @@ void gen(Node *node) {
       gen(node->els);
     printf(".Lend%d:\n", seq);
     return;
-  case ND_WHILE:
+  }
+  case ND_WHILE: {
+    int seq = labelseq++;
     printf(".Lbegin%d:\n", seq);
     gen(node->cond);
     printf("  pop rax\n");
@@ -96,7 +98,9 @@ void gen(Node *node) {
     printf("  jmp .Lbegin%d\n", seq);
     printf(".Lend%d:\n", seq);
     return;
-  case ND_FOR:
+  }
+  case ND_FOR: {
+    int seq = labelseq++;
     if (node->init)
       gen(node->init);
     printf(".Lbegin%d:\n", seq);
@@ -112,14 +116,11 @@ void gen(Node *node) {
     printf("  jmp .Lbegin%d\n", seq);
     printf(".Lend%d:\n", seq);
     return;
+  }
   case ND_BLOCK:
-    // node->block[i] != NULLでなければループしてgen
-    for (Node *block = node->block; block; block = block->next) {
+  case ND_STMT_EXPR:
+    for (Node *block = node->block; block; block = block->next)
       gen(block);
-      if (block->kind != ND_RETURN) {
-        printf("  pop rax\n");
-      }
-    }
     return;
   case ND_FUNCALL:
     int arg_count = 0;
@@ -153,7 +154,11 @@ void gen(Node *node) {
     gen(node->lhs);
     if (node->type->kind != TY_ARRAY)
       load(node->type);
-
+    return;
+  case ND_RETURN:
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  jmp .Lreturn.%s\n", funcname);
     return;
   }
 
@@ -326,6 +331,12 @@ void print_ast(Node *node, int depth) {
   case ND_DEREF:
     printf("DEREF\n");
     break;
+  case ND_EXPR_STMT:
+    printf("EXPR_STMT\n");
+    break;
+  case ND_STMT_EXPR:
+    printf("STMT_EXPR\n");
+    break;
   }
 
   // ND_NUM や ND_VAR のように左右の子を持たないノードでは再帰しない
@@ -343,4 +354,9 @@ void print_ast(Node *node, int depth) {
     print_ast(node->init, depth + 1);
   if (node->inc)
     print_ast(node->inc, depth + 1);
+  // ここに node->block や node->body のための再帰呼び出しが必要
+  if (node->block) { // ND_BLOCK や ND_STMT_EXPR の場合
+    for (Node *n = node->block; n; n = n->next)
+      print_ast(n, depth + 1);
+  }
 }

@@ -2,6 +2,7 @@
 
 VarList *locals;
 VarList *globals;
+VarList *scope;
 
 Var *push_var(char *name) {
   Var *var = calloc(1, sizeof(Var));
@@ -19,6 +20,12 @@ Var *create_var(char *name, Type *type, bool is_local) {
   var->name = name;
   var->type = type;
   var->is_local = is_local;
+
+  VarList *sc = calloc(1, sizeof(VarList));
+  sc->var = var;
+  sc->next = scope;
+  scope = sc;
+
   return var;
 }
 
@@ -77,13 +84,7 @@ Node *new_funcall_node(char *funcname, Node *args, Token *tok) {
 
 // ローカル変数かグローバル変数を名前で検索する。見つからなかった場合はNULLを返す
 Var *find_var(Token *tok) {
-  for (VarList *vl = locals; vl; vl = vl->next) {
-    Var *var = vl->var;
-    if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
-      return var;
-  }
-
-  for (VarList *vl = globals; vl; vl = vl->next) {
+  for (VarList *vl = scope; vl; vl = vl->next) {
     Var *var = vl->var;
     if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
       return var;
@@ -256,38 +257,34 @@ Node *declaration() {
   register_local(var);
 
   if (consume(";"))
-    return new_var_node(var, tok);
+    return new_node(ND_NULL, tok);
 
   expect("=");
   Node *lhs = new_var_node(var, tok);
   Node *rhs = expr();
   expect(";");
-  return new_binary_node(ND_ASSIGN, lhs, rhs, tok);
+  Node *node = new_binary_node(ND_ASSIGN, lhs, rhs, tok);
+  return new_unary_node(ND_EXPR_STMT, node, tok);
 }
 
-// stmt = expr ";"
-//      | "{" stmt* "}"
+Node *expr_stmt() {
+  Token *tok = token;
+  return new_unary_node(ND_EXPR_STMT, expr(), tok);
+}
+
+// stmt = "return" expr ";"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
 //      | "while" "(" expr ")" stmt
 //      | "for" "(" expr? ";" "expr? "; expr? ")" stmt
-//      | "return" expr ";"
+//      | "{" stmt* "}"
 //      | declaration
+//      | expr ";"
 Node *stmt() {
   Token *tok;
 
-  if (tok = consume("{")) {
-    Node block_head = {};
-    block_head.next = NULL;
-    Node *cur = &block_head;
-    while (!consume("}")) {
-      cur->next = stmt();
-      cur = cur->next;
-    }
-    cur->next = NULL;
-
-    Node *node = new_node(ND_BLOCK, tok);
-    node->block = block_head.next;
-
+  if (tok = consume("return")) {
+    Node *node = new_unary_node(ND_RETURN, expr(), tok);
+    expect(";");
     return node;
   }
 
@@ -319,7 +316,7 @@ Node *stmt() {
     Node *node = new_node(ND_FOR, tok);
     expect("(");
     if (!consume(";")) {
-      node->init = expr();
+      node->init = expr_stmt();
       expect(";");
     }
     if (!consume(";")) {
@@ -327,7 +324,7 @@ Node *stmt() {
       expect(";");
     }
     if (!consume(")")) {
-      node->inc = expr();
+      node->inc = expr_stmt();
       expect(")");
     }
     node->then = stmt();
@@ -335,17 +332,29 @@ Node *stmt() {
     return node;
   }
 
-  if (tok = consume("return")) {
-    Node *node = new_node(ND_RETURN, tok);
-    node->lhs = expr();
-    expect(";");
+  if (tok = consume("{")) {
+    Node block_head = {};
+    block_head.next = NULL;
+    Node *cur = &block_head;
+
+    VarList *sc = scope;
+    while (!consume("}")) {
+      cur->next = stmt();
+      cur = cur->next;
+    }
+    cur->next = NULL;
+    scope = sc;
+
+    Node *node = new_node(ND_BLOCK, tok);
+    node->block = block_head.next;
+
     return node;
   }
 
   if (is_typename())
     return declaration();
 
-  Node *node = expr();
+  Node *node = expr_stmt();
 
   if (!consume(";"))
     error_at(token->str, "';'ではないトークンです");
@@ -361,8 +370,8 @@ Node *expr() {
 // assign = equality ("=" assign)?
 Node *assign() {
   Node *node = equality();
-  Token *tok;
 
+  Token *tok;
   if (tok = consume("="))
     node = new_binary_node(ND_ASSIGN, node, assign(), tok);
   return node;
@@ -470,6 +479,30 @@ Node *postfix() {
   return node;
 }
 
+// stmt-expr = "(" "{" stmt stmt* "}" ")"
+//
+// Statement expression is a GNU C extension.
+Node *stmt_expr(Token *tok) {
+  VarList *sc = scope;
+
+  Node *node = new_node(ND_STMT_EXPR, tok);
+  node->block = stmt();
+  Node *cur = node->block;
+
+  while (!consume("}")) {
+    cur->next = stmt();
+    cur = cur->next;
+  }
+  expect(")");
+
+  scope = sc;
+
+  if (cur->kind != ND_EXPR_STMT)
+    error_tok(cur->tok, "stmt expr returning void is not supported");
+  *cur = *cur->lhs;
+  return node;
+}
+
 // func_args = "(" (expr ("," expr)*)? ")"
 Node *func_args() {
   if (consume(")"))
@@ -480,7 +513,7 @@ Node *func_args() {
   Node *cur = &head;
 
   while (!consume(")")) {
-    cur->next = expr();
+    cur->next = assign();
     cur = cur->next;
 
     if (!consume(","))
@@ -494,18 +527,22 @@ Node *func_args() {
 }
 
 // primary = "(" expr ")"
+//         | "(" "{" stmt-expr-tail
 //         | ident func_args?
 //         | str
 //         | num
 Node *primary() {
-  // 次のトークンが"("なら、"(" expr ")" のはず
+  Token *tok;
+
   if (consume("(")) {
+    if (consume("{"))
+      return stmt_expr(token);
+
     Node *node = expr();
     expect(")");
     return node;
   }
 
-  Token *tok;
   if (tok = consume_ident()) {
     // 関数呼び出し
     if (consume("(")) {
