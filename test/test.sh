@@ -209,5 +209,9 @@ assert 0 'int main() { // this is comment
 return 0;
 }'
 
+assert 0 'int main() { return ({ 0; }); }'
+assert 2 'int main() { return ({ 0; 1; 2; }); }'
+assert 1 'int main() { ({ 0; return 1; 2; }); return 3; }'
+assert 3 'int main() { return ({ int x=3; x; }); }'
 
 echo OK
