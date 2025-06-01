@@ -46,6 +46,38 @@ int main() {
            a + b;
          }),
          "{ int a; int b; a=3 ;b=5; a+b; }");
+  assert(14, ({
+           int a;
+           int b;
+           a = 3;
+           b = 5 * 6 - 8;
+           a + b / 2;
+         }),
+         "int a; int b; a=3; b=5*6-8; a+b/2;");
+  assert(3, ({
+           int foo;
+           int bar;
+           foo = 1;
+           bar = foo + 2;
+           bar;
+         }),
+         "int foo; int bar; foo=1; bar=foo+2; bar;");
+  assert(3, ({
+           int foo;
+           int bar;
+           foo = 1;
+           bar = 2;
+           foo + bar;
+         }),
+         "int foo; int bar; foo = 1; bar = 2; foo + bar;");
+  assert(14, ({
+           int a;
+           int b;
+           a = 3;
+           b = 5 * 6 - 8;
+           a + b / 2;
+         }),
+         "int a; int b; a = 3;b = 5 * 6 - 8;a + b / 2;");
 
   printf("OK!\n");
   return 0;
