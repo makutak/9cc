@@ -79,6 +79,42 @@ int main() {
          }),
          "int a; int b; a = 3;b = 5 * 6 - 8;a + b / 2;");
 
+  assert(3, ({
+           int x = 0;
+           if (0)
+             x = 2;
+           else
+             x = 3;
+           x;
+         }),
+         "int x = 0; if (1) x = 2; else  x = 3; x;");
+
+  assert(0, ({
+           int x = 0;
+           if (1 == 0)
+             x = 1;
+           else
+             x = 0;
+           x;
+         }),
+         "int x = 0; if (1 == 0) x = 1; else x = 0; x;");
+  assert(10, ({
+           int i;
+           i = 0;
+           while (i < 10)
+             i = i + 1;
+           i;
+         }),
+         "int i; i=0; while(i<10) i=i+1; i;");
+  assert(11, ({
+           int i;
+           i = 0;
+           while (i <= 10)
+             i = i + 1;
+           i;
+         }),
+         "int i; i=0; while(i<=10) i=i+1; i;");
+
   printf("OK!\n");
   return 0;
 }
