@@ -2,7 +2,7 @@ int assert(int expected, int actual, char *code) {
   if (expected == actual) {
     printf("%s => %d\n", code, actual);
   } else {
-    printf("%s => %d expected, but got %d\n", code, expected, actual);
+    printf("%s => %d expected but got %d\n", code, expected, actual);
     exit(1);
   }
 }
@@ -38,5 +38,15 @@ int main() {
   assert(1, 1 >= 1, "1>=1");
   assert(0, 1 >= 2, "1>=2");
 
+  assert(8, ({
+           int a;
+           int b;
+           a = 3;
+           b = 5;
+           a + b;
+         }),
+         "{ int a; int b; a=3 ;b=5; a+b; }");
+
+  printf("OK!\n");
   return 0;
 }
