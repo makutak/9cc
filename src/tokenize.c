@@ -163,6 +163,40 @@ bool is_alnum(char c) {
   return is_alpha(c) || ('0' <= c && c <= '9') || (c == '_');
 }
 
+Token *read_string_literal(Token *cur, char *start) {
+  char *p = start + 1;
+  char buf[1024];
+  int len = 0;
+
+  for (;;) {
+    if (len == sizeof(buf))
+      error_at(start, "文字列リテラルが長すぎます");
+    if (*p == '\0')
+      error_at(start, "文字列リテラルが閉じられていません");
+    if (*p == '"')
+      break;
+
+    if (*p == '\\') {
+      p++;
+      if (*p == 'n') {
+        buf[len++] = '\n';
+        p++;
+      }
+
+    } else {
+      buf[len++] = *p++;
+    }
+  }
+
+  Token *tok = new_token(TK_STR, cur, start, p - start + 1);
+  tok->contents = malloc(len + 1);
+  memcpy(tok->contents, buf, len);
+  tok->contents[len] = '\0';
+  tok->cont_len = len + 1;
+
+  return tok;
+}
+
 // 入力文字列pをトークナイズしてそれを返す
 Token *tokenize() {
   char *p = user_input;
@@ -259,21 +293,8 @@ Token *tokenize() {
     }
 
     if (*p == '"') {
-      char *q = p++; // "の開始をqにセットし、pをインクリメント
-      while (*p && *p != '"')
-        p++;
-      if (!*p)
-        error_at(q, "文字列リテラルが閉じられていません");
-      p++; // "の終了位置をスキップ
-
-      cur = new_token(TK_STR, cur, q, p - q);
-
-      // q + 1 => 開きクォートの次の文字
-      // p - q - 2 => 開きクォートと閉じクォートを除外した文字列の長さ(\0含む)
-      cur->contents = strndup(q + 1, p - q - 2);
-
-      // 閉じクォートを除外した文字列の長さ(\0含まない)
-      cur->cont_len = p - q - 1;
+      cur = read_string_literal(cur, p);
+      p += cur->len;
       continue;
     }
 
