@@ -163,6 +163,15 @@ bool is_alnum(char c) {
   return is_alpha(c) || ('0' <= c && c <= '9') || (c == '_');
 }
 
+char get_escape_char(char c) {
+  switch (c) {
+  case 'n':
+    return '\n';
+  default:
+    return c;
+  }
+}
+
 Token *read_string_literal(Token *cur, char *start) {
   char *p = start + 1;
   char buf[1024];
@@ -178,11 +187,7 @@ Token *read_string_literal(Token *cur, char *start) {
 
     if (*p == '\\') {
       p++;
-      if (*p == 'n') {
-        buf[len++] = '\n';
-        p++;
-      }
-
+      buf[len++] = get_escape_char(*p++);
     } else {
       buf[len++] = *p++;
     }
