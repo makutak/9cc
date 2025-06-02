@@ -99,21 +99,28 @@ int main() {
          }),
          "int x = 0; if (1 == 0) x = 1; else x = 0; x;");
   assert(10, ({
-           int i;
-           i = 0;
+           int i = 0;
            while (i < 10)
              i = i + 1;
            i;
          }),
-         "int i; i=0; while(i<10) i=i+1; i;");
+         "int i =0; while(i<10) i=i+1; i;");
   assert(11, ({
-           int i;
-           i = 0;
+           int i = 0;
            while (i <= 10)
              i = i + 1;
            i;
          }),
-         "int i; i=0; while(i<=10) i=i+1; i;");
+         "int i =0; while(i<=10) i=i+1; i;");
+
+  assert(55, ({
+           int i = 0;
+           int j = 0;
+           for (i = 0; i <= 10; i = i + 1)
+             j = i + j;
+           j;
+         }),
+         "int i = 0; int j = 0; for (i=0; i<=10; i=i+1) j=i+j; j;");
 
   printf("OK!\n");
   return 0;
