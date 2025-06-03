@@ -67,6 +67,10 @@ int fib(int x) {
   return fib(x - 1) + fib(x - 2);
 }
 
+int foo(int *x, int y) {
+  return *x + y;
+}
+
 int main() {
   assert(0, 0, "0");
   assert(42, 42, "42");
@@ -206,6 +210,137 @@ int main() {
            *p;
          }),
          "int x=3; int *p=&x; *p;");
+
+  assert(3, ({
+           int x = 3;
+           *&x;
+         }),
+         "int x=3; *&x;");
+
+  assert(3, ({
+           int x = 3;
+           int *y = &x;
+           int **z = &y;
+           **z;
+         }),
+         "int x=3; int *y=&x; int **z=&y; **z;");
+  assert(5, ({
+           int x = 3;
+           int y = 5;
+           *(&x + 1);
+         }),
+         "int x=3; int y=5; *(&x+1);");
+  assert(5, ({
+           int x = 3;
+           int y = 5;
+           *(1 + &x);
+         }),
+         "int x=3; int y=5; *(1+&x);");
+  assert(3, ({
+           int x = 3;
+           int y = 5;
+           *(&y - 1);
+         }),
+         "int x=3; int y=5;  *(&y-1);");
+  assert(5, ({
+           int x = 3;
+           int y = 5;
+           int *z = &x;
+           *(z + 1);
+         }),
+         "int x=3; int y=5; int *z=&x; *(z+1);");
+  assert(3, ({
+           int x = 3;
+           int y = 5;
+           int *z = &y;
+           *(z - 1);
+         }),
+         "int x=3; int y=5; int *z=&y; *(z-1);");
+  assert(5, ({
+           int x = 3;
+           int *y = &x;
+           *y = 5;
+           x;
+         }),
+         "int x=3; int *y=&x; *y=5; x;");
+  assert(7, ({
+           int x = 3;
+           int y = 5;
+           *(&x + 1) = 7;
+           y;
+         }),
+         "int x=3; int y=5; *(&x+1)=7; y;");
+  assert(7, ({
+           int x = 3;
+           int y = 5;
+           *(&y - 1) = 7;
+           x;
+         }),
+         "int x=3; int y=5; *(&y-1)=7; x;");
+  assert(8, ({
+           int x = 3;
+           int y = 5;
+           foo(&x, y);
+         }),
+         "int x=3; int y=5; foo(&x, y);");
+
+  assert(4, ({
+           int x;
+           sizeof(x);
+         }),
+         "int x; sizeof(x);");
+  assert(8, ({
+           int *y;
+           sizeof(y);
+         }),
+         "int *y; sizeof(y);");
+  assert(4, ({
+           int x;
+           sizeof(x + 3);
+         }),
+         "int x; sizeof(x + 3);");
+  assert(8, ({
+           int *y;
+           sizeof(y + 3);
+         }),
+         "int *y; sizeof(y + 3);");
+  assert(4, ({
+           int *y;
+           sizeof(*y);
+         }),
+         "int *y; sizeof(*y);");
+  assert(4, ({ sizeof(1); }), "sizeof(1);");
+  // 本来はsize_tなので8になる
+  assert(4, ({ sizeof(sizeof(1)); }), "sizeof(sizeof(1));");
+
+  assert(4, ({
+           int x;
+           sizeof x;
+         }),
+         "int x; sizeof x;");
+  assert(8, ({
+           int *y;
+           sizeof y;
+         }),
+         "int *y; sizeof y;");
+  assert(7, ({
+           int x;
+           sizeof x + 3;
+         }),
+         "int x; sizeof x + 3;");
+  assert(11, ({
+           int *y;
+           sizeof y + 3;
+         }),
+         "int *y; sizeof y + 3;");
+  assert(4, ({
+           int *y;
+           sizeof *y;
+         }),
+         "int *y; sizeof *y;");
+  assert(4, ({ sizeof 1; }), "sizeof 1;");
+  // 本来はsize_tなので8になる
+  assert(4, ({ sizeof sizeof 1; }), "sizeof sizeof 1;");
 
   printf("OK!\n");
   return 0;
