@@ -7,6 +7,66 @@ int assert(int expected, int actual, char *code) {
   }
 }
 
+/* void alloc4(int **p, int a, int b, int c, int d) { */
+/*   *p = malloc(sizeof(int) * 4); */
+/*   (*p)[0] = a; */
+/*   (*p)[1] = b; */
+/*   (*p)[2] = c; */
+/*   (*p)[3] = d; */
+/* } */
+
+int return_3() {
+  return 3;
+}
+
+int return_5() {
+  return 5;
+}
+
+int add(int a, int b) {
+  return a + b;
+}
+
+int sub(int a, int b) {
+  return a - b;
+}
+
+int add6(int a, int b, int c, int d, int e, int f) {
+  return a + b + c + d + e + f;
+}
+
+int sub6(int a, int b, int c, int d, int e, int f) {
+  return a - b - c - d - e - f;
+}
+
+int sum(int i, int j) {
+  int sum = 0;
+
+  // TODO: i++,i-- の対応
+  for (i; i <= j; i = i + 1) {
+    sum = i + sum;
+  }
+  return sum;
+}
+
+int ret32() {
+  return 32;
+}
+
+int add2(int x, int y) {
+  return x + y;
+}
+
+int sub2(int x, int y) {
+  return x - y;
+}
+
+int fib(int x) {
+  if (x <= 1)
+    return 1;
+  return fib(x - 1) + fib(x - 2);
+}
+
 int main() {
   assert(0, 0, "0");
   assert(42, 42, "42");
@@ -121,6 +181,31 @@ int main() {
            j;
          }),
          "int i = 0; int j = 0; for (i=0; i<=10; i=i+1) j=i+j; j;");
+
+  assert(3, return_3(), "return_3();");
+  assert(5, return_5(), "return_5();");
+  assert(2, add(1, 1), "add(1, 1)");
+  assert(0, sub(1, 1), "sub(1, 1)");
+  assert(21, add6(1, 2, 3, 4, 5, 6), "add6(1, 2, 3, 4, 5, 6)");
+  assert(0, sub6(15, 5, 4, 3, 2, 1), "sub6(15, 5, 4, 3, 2, 1)");
+  assert(55, sum(1, 10), "sum(1, 10)");
+  assert(32, ret32(), "ret32()");
+  assert(7, add2(3, 4), "add2(3,4)");
+  assert(1, sub2(4, 3), "sub2(4,3)");
+  assert(55, fib(9), "fib(9)");
+
+  assert(3, ({
+           int x;
+           x = 3;
+           *&x;
+         }),
+         "int x; x = 3; *&x;");
+  assert(3, ({
+           int x = 3;
+           int *p = &x;
+           *p;
+         }),
+         "int x=3; int *p=&x; *p;");
 
   printf("OK!\n");
   return 0;
