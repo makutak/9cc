@@ -71,6 +71,10 @@ int foo(int *x, int y) {
   return *x + y;
 }
 
+int sub_char(char a, char b, char c) {
+  return a - b - c;
+}
+
 int main() {
   assert(0, 0, "0");
   assert(42, 42, "42");
@@ -359,6 +363,18 @@ int main() {
            y;
          }),
          "char x=1; char y=2; y;");
+
+  assert(1, ({
+           char x;
+           sizeof(x);
+         }),
+         "char x; sizeof(x);");
+  assert(10, ({
+           char x[10];
+           sizeof(x);
+         }),
+         "char x[10]; sizeof(x);");
+  assert(1, ({ sub_char(7, 3, 3); }), "sub_char(7, 3, 3);");
 
   printf("OK!\n");
   return 0;
