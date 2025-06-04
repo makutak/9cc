@@ -342,6 +342,24 @@ int main() {
   // 本来はsize_tなので8になる
   assert(4, ({ sizeof sizeof 1; }), "sizeof sizeof 1;");
 
+  assert(1, ({
+           char x = 1;
+           x;
+         }),
+         "char x=1; x;");
+  assert(1, ({
+           char x = 1;
+           char y = 2;
+           x;
+         }),
+         "char x=1; char y=2; x;");
+  assert(2, ({
+           char x = 1;
+           char y = 2;
+           y;
+         }),
+         "char x=1; char y=2; y;");
+
   printf("OK!\n");
   return 0;
 }
