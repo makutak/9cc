@@ -376,6 +376,50 @@ int main() {
          "char x[10]; sizeof(x);");
   assert(1, ({ sub_char(7, 3, 3); }), "sub_char(7, 3, 3);");
 
+  assert(97, ({ "abc"[0]; }), "\"abc\"[0];");
+  assert(98, ({ "abc"[1]; }), "\"abc\"[1];");
+  assert(99, ({ "abc"[2]; }), "\"abc\"[2];");
+  assert(0, ({ "abc"[3]; }), "\"abc\"[3];");
+  assert(4, ({ sizeof("abc"); }), "sizeof(\"abc\");");
+
+  /*
+   * This is a block comment
+   */
+
+  // This is a line comment
+
+  assert(0, ({ 0; }), "({ 0; });");
+  assert(2, ({
+           0;
+           1;
+           2;
+         }),
+         "({ 0; 1; 2; }); }");
+  assert(3, ({
+           int x = 3;
+           x;
+         }),
+         "({ int x=3; x; });");
+  assert(2, ({
+           int x = 2;
+           { int x = 3; }
+           x;
+         }),
+         "int x=2; { int x=3; } x;");
+  assert(2, ({
+           int x = 2;
+           { int x = 3; }
+           int y = 4;
+           x;
+         }),
+         "int x=2; { int x=3; } int y=4; x;");
+  assert(3, ({
+           int x = 2;
+           { x = 3; }
+           x;
+         }),
+         "int x=2; { x=3; } x;");
+
   printf("OK!\n");
   return 0;
 }
