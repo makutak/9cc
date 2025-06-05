@@ -3,3 +3,6 @@
 tmp*
 a.out
 9cc
+TAGS
+cscope.*
+.dir-locals.el
