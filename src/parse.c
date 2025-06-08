@@ -188,14 +188,16 @@ Program *program() {
   return prog;
 }
 
-// basetype = ("char" | "int") "*"*
+// basetype = ("char" | "int" | "void") "*"*
 Type *basetype() {
   Type *type;
 
   if (consume("char")) {
     type = char_type();
+  } else if (consume("int")) {
+    type = int_type();
   } else {
-    expect("int");
+    expect("void");
     type = int_type();
   }
 
