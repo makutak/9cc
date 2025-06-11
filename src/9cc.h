@@ -190,6 +190,7 @@ Type *pointer_to(Type *base);
 Type *array_type(Type *base, int size);
 void add_type(Program *prog);
 int size_of(Type *type);
+int align_of(Type *type);
 
 //
 // codegen.c

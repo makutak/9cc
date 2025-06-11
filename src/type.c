@@ -41,6 +41,20 @@ int size_of(Type *type) {
   error("不明な型です");
 }
 
+int align_of(Type *type) {
+  switch (type->kind) {
+  case TY_CHAR:
+    return 1;
+  case TY_INT:
+    return 4;
+  case TY_PTR:
+    return 8;
+  case TY_ARRAY:
+    return size_of(type->base);
+  }
+  error("不明な型です");
+}
+
 void visit(Node *node) {
   if (!node)
     return;
