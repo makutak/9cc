@@ -216,15 +216,28 @@ void emit_data(Program *prog) {
 
   for (VarList *vl = prog->globals; vl; vl = vl->next) {
     Var *var = vl->var;
-    printf("%s:\n", var->name);
 
-    if (!var->contents) {
-      printf("  .zero %d\n", size_of(var->type));
+    if (!var->contents)
       continue;
-    }
+
+    printf("%s:\n", var->name);
 
     for (int i = 0; i < var->cont_len; i++)
       printf("  .byte %d\n", var->contents[i]);
+  }
+}
+
+void emit_bss(Program *prog) {
+  printf(".bss\n");
+  for (VarList *vl = prog->globals; vl; vl = vl->next) {
+    Var *var = vl->var;
+
+    if (var->contents)
+      continue;
+
+    printf(".align %d\n", align_of(var->type));
+    printf("%s:\n", var->name);
+    printf("  .zero %d\n", size_of(var->type));
   }
 }
 
@@ -269,6 +282,7 @@ void emit_text(Program *prog) {
 void codegen(Program *prog) {
   printf(".intel_syntax noprefix\n");
   emit_data(prog);
+  emit_bss(prog);
   emit_text(prog);
   printf(".section .note.GNU-stack,\"\",@progbits\n"); // 警告を消すため
 }
