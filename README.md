@@ -1,39 +1,39 @@
-# 9cc - 自作Cコンパイラ
+# 9cc - A Handmade C Compiler
 
-> **📖 参考書籍**: このコンパイラは[低レイヤを知りたい人のためのCコンパイラ作成入門](https://www.sigbus.info/compilerbook)を参考に実装されています。
+> **📖 Reference Book**: This compiler is implemented based on `https://www.sigbus.info/compilerbook`.
 
-9ccは教育目的で作成された小さなCコンパイラです。CのサブセットをコンパイルしてLinux x86-64アセンブリを出力します。
+9cc is a small C compiler created for educational purposes. It compiles a subset of the C language and outputs Linux x86-64 assembly.
 
-## 機能
+## Features
 
-### 対応している言語機能
+### Supported Language Features
 
-- **データ型**: `int`, `char`, ポインタ、配列
-- **演算子**:
-  - 算術演算子: `+`, `-`, `*`, `/`
-  - 比較演算子: `==`, `!=`, `<`, `<=`, `>`, `>=`
-  - 代入演算子: `=`
-  - アドレス演算子: `&`, `*`
-  - `sizeof`演算子
-- **制御構文**:
-  - `if`文（`else`含む）
-  - `while`ループ
-  - `for`ループ
-- **関数**: 関数定義、関数呼び出し（最大6引数）
-- **変数**: ローカル変数、グローバル変数
-- **配列**: 1次元・多次元配列
-- **文字列リテラル**: `"hello"`
-- **ブロック**: `{}`によるスコープ
-- **コメント**: `//`と`/* */`
+- **Data Types**: `int`, `char`, pointers, arrays
+- **Operators**:
+  - Arithmetic operators: `+`, `-`, `*`, `/`
+  - Comparison operators: `==`, `!=`, `<`, `<=`, `>`, `>=`
+  - Assignment operator: `=`
+  - Address operators: `&`, `*`
+  - `sizeof` operator
+- **Control Structures**:
+  - `if` statements (with `else`)
+  - `while` loops
+  - `for` loops
+- **Functions**: Function definitions, function calls (up to 6 arguments)
+- **Variables**: Local variables, global variables
+- **Arrays**: 1-dimensional and multi-dimensional arrays
+- **String Literals**: `"hello"`
+- **Blocks**: Scope with `{}`
+- **Comments**: `//` and `/* */`
 - **Statement expression**: `({ ... })`
 
-## ビルド
+## Build
 
 ```bash
 make
 ```
 
-## 使用方法
+## Usage
 
 ```bash
 ./9cc <input.c> > output.s
@@ -41,7 +41,7 @@ gcc -static -o program output.s
 ./program
 ```
 
-### 例
+### Example
 
 ```c
 // hello.c
@@ -55,49 +55,49 @@ int main() {
 ./9cc hello.c > hello.s
 gcc -static -o hello hello.s
 ./hello
-echo $?  # 42が出力される
+echo $?  # Outputs 42
 ```
 
-## テスト
+## Testing
 
 ```bash
 make test
 ```
 
-テストは`test/test.c`に記述されており、様々なC言語の機能をテストします。
+Tests are written in `test/test.c` and test various C language features.
 
-## アーキテクチャ
+## Architecture
 
-コンパイラは以下の段階で動作します：
+The compiler operates in the following stages:
 
-1. **字句解析** (`tokenize.c`): ソースコードをトークンに分割
-2. **構文解析** (`parse.c`): トークンから抽象構文木(AST)を構築
-3. **型チェック** (`type.c`): ASTに型情報を付与
-4. **コード生成** (`codegen.c`): ASTからx86-64アセンブリを生成
+1. **Lexical Analysis** (`tokenize.c`): Split source code into tokens
+2. **Parsing** (`parse.c`): Build Abstract Syntax Tree (AST) from tokens
+3. **Type Checking** (`type.c`): Add type information to AST
+4. **Code Generation** (`codegen.c`): Generate x86-64 assembly from AST
 
-## ファイル構成
+## File Structure
 
 ```
 src/
-├── 9cc.h      # ヘッダファイル（構造体、関数宣言）
-├── main.c     # メインエントリーポイント
-├── tokenize.c # 字句解析
-├── parse.c    # 構文解析
-├── type.c     # 型チェック
-└── codegen.c  # コード生成
+├── 9cc.h      # Header file (structs, function declarations)
+├── main.c     # Main entry point
+├── tokenize.c # Lexical analysis
+├── parse.c    # Parsing
+├── type.c     # Type checking
+└── codegen.c  # Code generation
 
 test/
-├── test.sh    # テストスクリプト
-└── test.c     # テスト用ファイル
+├── test.sh    # Test script
+└── test.c     # Test file
 ```
 
-## 制限事項
+## Limitations
 
-- 標準ライブラリ関数の一部のみサポート
-- プリプロセッサ未対応
-- 構造体・共用体未対応
-- float/double型未対応
-- 複雑なポインタ演算の一部制限
+- Only a subset of standard library functions supported
+- No preprocessor support
+- No struct/union support
+- No float/double type support
+- Some complex pointer arithmetic limitations
 
-## 参考資料
-- [低レイヤを知りたい人のためのCコンパイラ作成入門](https://www.sigbus.info/compilerbook) - Rui Ueyama氏によるコンパイラ作成チュートリアル
+## References
+- `https://www.sigbus.info/compilerbook` - A compiler creation tutorial by Rui Ueyama
