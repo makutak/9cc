@@ -1,6 +1,6 @@
 # 9cc - A Handmade C Compiler
 
-> **📖 Reference Book**: This compiler is implemented based on `https://www.sigbus.info/compilerbook`.
+> **📖 Reference Book**: This compiler is implemented based on https://www.sigbus.info/compilerbook.
 
 9cc is a small C compiler created for educational purposes. It compiles a subset of the C language and outputs Linux x86-64 assembly.
 
@@ -100,4 +100,4 @@ test/
 - Some complex pointer arithmetic limitations
 
 ## References
-- `https://www.sigbus.info/compilerbook` - A compiler creation tutorial by Rui Ueyama
+- https://www.sigbus.info/compilerbook - A compiler creation tutorial by Rui Ueyama
